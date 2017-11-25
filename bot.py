@@ -71,7 +71,7 @@ async def killbot(ctx):
         await bot.change_presence(status=discord.Status.invisible)
         await sys.exit()
 
-@bot.command()
+@bot.command(aliases=["flip","coin"])
 async def flipcoin():
     if randint(0,1) == 0:
         await bot.say("Tails")
@@ -124,7 +124,7 @@ async def removerole(ctx):
             #await bot.say(role + " role removed from " + ctx.message.author.mention)
 """
 
-@bot.command(pass_context=True)
+@bot.command(pass_context=True, aliases=["addrole"])
 async def getrole(ctx, addrole : str):
     #role = ctx.message.content[len(str(config["prefix"]))+8:]
     alreadyhaveroles = []
@@ -147,7 +147,7 @@ async def getrole(ctx, addrole : str):
             await bot.add_roles(ctx.message.author, discord.utils.get(ctx.message.server.roles,name=addrole))
             #await bot.add_reaction(ctx.message, emoji)
 
-@bot.command(pass_context=True)
+@bot.command(pass_context=True, aliases=["rmvrole"])
 async def removerole(ctx, rmvrole : str):
     #role = ctx.message.content[len(str(config["prefix"]))+8:]
     alreadyhaveroles = []
