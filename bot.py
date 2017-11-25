@@ -14,35 +14,42 @@ from cogs.utils.checks import *
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)"""
 
-bot = Bot(description=config["description"], command_prefix=config["prefix"], pm_help = True)
+bot = Bot(description=config["description"], command_prefix=config["prefix"], pm_help=True)
+
 
 @bot.event
 async def on_ready():
-    print('Logged in as '+bot.user.name+' (ID:'+bot.user.id+') | Connected to '+str(len(bot.servers))+' servers | Connected to '+str(len(set(bot.get_all_members())))+' users')
+    print('Logged in as ' + bot.user.name + ' (ID:' + bot.user.id + ') | Connected to ' + str(
+        len(bot.servers)) + ' servers | Connected to ' + str(len(set(bot.get_all_members()))) + ' users')
     print('------')
     print('Use this link to invite {}:'.format(bot.user.name))
     print('https://discordapp.com/oauth2/authorize?client_id={}&scope=bot&permissions=8'.format(bot.user.id))
-    print('Current Discord.py Version: {} | Current Python Version: {}'.format(discord.__version__, platform.python_version()))
+    print('Current Discord.py Version: {} | Current Python Version: {}'.format(discord.__version__,
+                                                                               platform.python_version()))
     await bot.change_presence(game=discord.Game(name="What do you want?"))
     await bot.change_presence(status=discord.Status.online)
+
 
 @bot.command(pass_context=True)
 async def roles(ctx):
     if is_admin(ctx):
-        await bot.say(ctx.message.author.name+":"+ctx.message.author.id)
+        await bot.say(ctx.message.author.name + ":" + ctx.message.author.id)
         for role in ctx.message.server.roles:
-            await bot.say(role.name+":"+role.id)
+            await bot.say(role.name + ":" + role.id)
         await bot.say("Idk why this takes me a while to find, but I'm done now")
+
 
 @bot.command()
 async def hey():
     await bot.say("hey baby gurr")
 
+
 @bot.command(pass_context=True)
 async def setgame(ctx):
     if is_admin(ctx):
-        setgameto = ctx.message.content[len(str(config["prefix"]))+7:]
+        setgameto = ctx.message.content[len(str(config["prefix"])) + 7:]
         await bot.change_presence(game=discord.Game(name=setgameto))
+
 
 @bot.command(pass_context=True)
 async def setstatus(ctx):
@@ -71,13 +78,15 @@ async def killbot(ctx):
         await bot.change_presence(status=discord.Status.invisible)
         await sys.exit()
 
-@bot.command(aliases=["flip","coin"])
+
+@bot.command(aliases=["flip", "coin"])
 async def flipcoin():
-    if randint(0,1) == 0:
+    if randint(0, 1) == 0:
         await bot.say("Tails")
     else:
         await bot.say("Heads")
-    
+
+
 """
 @bot.command(pass_context=True)
 async def getrole(ctx):
@@ -124,13 +133,14 @@ async def removerole(ctx):
             #await bot.say(role + " role removed from " + ctx.message.author.mention)
 """
 
+
 @bot.command(pass_context=True, aliases=["addrole"])
-async def getrole(ctx, addrole : str):
-    #role = ctx.message.content[len(str(config["prefix"]))+8:]
+async def getrole(ctx, addrole: str):
+    # role = ctx.message.content[len(str(config["prefix"]))+8:]
     alreadyhaveroles = []
     validrole = False
     toprole = 0
-    #rolee = discord.utils.get(member.server.roles,name=addrole)
+    # rolee = discord.utils.get(member.server.roles,name=addrole)
     for role in ctx.message.server.roles:
         if role.name == "overwatch":
             toprole = role.position
@@ -140,20 +150,21 @@ async def getrole(ctx, addrole : str):
     for role1 in ctx.message.author.roles:
         alreadyhaveroles.append(str(role1))
     if addrole in alreadyhaveroles:
-        #await bot.add_reaction(ctx.message, emoji)
+        # await bot.add_reaction(ctx.message, emoji)
         pass
     else:
-        if validrole == True:
-            await bot.add_roles(ctx.message.author, discord.utils.get(ctx.message.server.roles,name=addrole))
-            #await bot.add_reaction(ctx.message, emoji)
+        if validrole:
+            await bot.add_roles(ctx.message.author, discord.utils.get(ctx.message.server.roles, name=addrole))
+            # await bot.add_reaction(ctx.message, emoji)
+
 
 @bot.command(pass_context=True, aliases=["rmvrole"])
-async def removerole(ctx, rmvrole : str):
-    #role = ctx.message.content[len(str(config["prefix"]))+8:]
+async def removerole(ctx, rmvrole: str):
+    # role = ctx.message.content[len(str(config["prefix"]))+8:]
     alreadyhaveroles = []
     validrole = False
     toprole = 0
-    #rolee = discord.utils.get(member.server.roles,name=addrole)
+    # rolee = discord.utils.get(member.server.roles,name=addrole)
     for role in ctx.message.server.roles:
         if role.name == "overwatch":
             toprole = role.position
@@ -163,12 +174,13 @@ async def removerole(ctx, rmvrole : str):
     for role1 in ctx.message.author.roles:
         alreadyhaveroles.append(str(role1))
     if rmvrole in alreadyhaveroles:
-        if validrole == True:
-            await bot.remove_roles(ctx.message.author, discord.utils.get(ctx.message.server.roles,name=rmvrole))
-            #await bot.add_reaction(ctx.message, emoji)
+        if validrole:
+            await bot.remove_roles(ctx.message.author, discord.utils.get(ctx.message.server.roles, name=rmvrole))
+            # await bot.add_reaction(ctx.message, emoji)
     else:
         pass
-            #await bot.add_reaction(ctx.message, emoji)
+        # await bot.add_reaction(ctx.message, emoji)
+
 
 @bot.command(pass_context=True)
 async def checkmember(ctx):
@@ -181,9 +193,9 @@ async def checkmember(ctx):
                     is_verified = True
                     break
             if is_verified == False:
-                #await bot.add_roles(member, discord.utils.get(ctx.message.server.roles,name="Member"))
+                # await bot.add_roles(member, discord.utils.get(ctx.message.server.roles,name="Member"))
                 notverified.append(str(member))
-                #await bot.say("Added Member role to "+member.name)
+                # await bot.say("Added Member role to "+member.name)
         await bot.say(str(notverified) + " do not have the Member role")
 
 
@@ -201,26 +213,31 @@ async def test33(ctx):
         for em in lt:
             await bot.say(em.name)
 
-@bot.command(pass_context=True)
-async def roll(ctx):
-    if len(ctx.message.content) == len(config["prefix"]+4):
-        await bot.say(ctx.message.author.name+ " rolled a " + str(randint(1,6)))
-    else:
-        await bot.say(ctx.message.author.name+ " rolled a " + str(randint(1,maximumroll)))
 
 @bot.command(pass_context=True)
-async def purge(ctx, number : int):
+async def roll(ctx, maximumroll: int):
+    if len(ctx.message.content) == len(config["prefix"] + 4):
+        await bot.say(ctx.message.author.name + " rolled a " + str(randint(1, 6)))
+    else:
+        await bot.say(ctx.message.author.name + " rolled a " + str(randint(1, maximumroll)))
+
+
+@bot.command(pass_context=True)
+async def purge(ctx, number: int):
     if is_admin(ctx):
-        deleted = await bot.purge_from(ctx.message.channel, limit=number+1)
-        #await bot.send_message(ctx.message.channel, 'Deleted {} message(s)'.format(len(deleted)))
+        await bot.purge_from(ctx.message.channel, limit=number + 1)
+        # await bot.send_message(ctx.message.channel, 'Deleted {} message(s)'.format(len(deleted)))
+
 
 @bot.command(pass_context=True)
 async def membercount(ctx):
     await bot.say("This server has {} users connected.".format(ctx.message.server.member_count))
 
-@bot.command(pass_context=True)
-async def ping(ctx):
+
+@bot.command()
+async def ping():
     await bot.say(":ping_pong: Pong!")
+
 
 @bot.listen()
 async def on_member_join(member):
@@ -230,11 +247,11 @@ async def on_member_join(member):
             is_verified = True
             break
     if is_verified == False:"""
-    await bot.send_message(discord.Object(id='382699994639237120'),str(member) + " has joined the server")
-    #await bot.send_message(discord.Object(id='382699994639237120'),str(discord.utils.get(member.server.roles,name="Member")))
-    #await bot.send_message(discord.Object(id='382699994639237120'),discord.utils.get(member.server.roles,name="Member"))
-    #await bot.send_message(discord.Object(id='382699994639237120'),type(discord.utils.get(member.server.roles,name="Member")))
-    await bot.add_roles(member, discord.utils.get(member.server.roles,name="Member"))
+    await bot.send_message(discord.Object(id='382699994639237120'), str(member) + " has joined the server")
+    # await bot.send_message(discord.Object(id='382699994639237120'),str(discord.utils.get(member.server.roles,name="Member")))
+    # await bot.send_message(discord.Object(id='382699994639237120'),discord.utils.get(member.server.roles,name="Member"))
+    # await bot.send_message(discord.Object(id='382699994639237120'),type(discord.utils.get(member.server.roles,name="Member")))
+    await bot.add_roles(member, discord.utils.get(member.server.roles, name="Member"))
 
 
-bot.run(config["tokens"]["discord"],bot=True,reconnect=True)
+bot.run(config["tokens"]["discord"], bot=True, reconnect=True)
