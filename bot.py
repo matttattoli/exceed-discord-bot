@@ -78,7 +78,7 @@ async def flipcoin():
     else:
         await bot.say("Heads")
     
-
+"""
 @bot.command(pass_context=True)
 async def getrole(ctx):
     role = ctx.message.content[len(str(config["prefix"]))+8:]
@@ -122,7 +122,53 @@ async def removerole(ctx):
             await bot.remove_roles(ctx.message.author, discord.utils.get(ctx.message.server.roles,name=role))
             #await bot.add_reaction(ctx.message,":white_check_mark:")
             #await bot.say(role + " role removed from " + ctx.message.author.mention)
+"""
 
+@bot.command(pass_context=True)
+async def getrole(ctx, addrole : str):
+    #role = ctx.message.content[len(str(config["prefix"]))+8:]
+    alreadyhaveroles = []
+    validrole = False
+    toprole = 0
+    #rolee = discord.utils.get(member.server.roles,name=addrole)
+    for role in ctx.message.server.roles:
+        if role.name == "overwatch":
+            toprole = role.position
+    for role in ctx.message.server.roles:
+        if role.name == addrole and role.position <= toprole and role.position >= 1:
+            validrole = True
+    for role1 in ctx.message.author.roles:
+        alreadyhaveroles.append(str(role1))
+    if addrole in alreadyhaveroles:
+        #await bot.add_reaction(ctx.message, emoji)
+        pass
+    else:
+        if validrole == True:
+            await bot.add_roles(ctx.message.author, discord.utils.get(ctx.message.server.roles,name=addrole))
+            #await bot.add_reaction(ctx.message, emoji)
+
+@bot.command(pass_context=True)
+async def removerole(ctx, rmvrole : str):
+    #role = ctx.message.content[len(str(config["prefix"]))+8:]
+    alreadyhaveroles = []
+    validrole = False
+    toprole = 0
+    #rolee = discord.utils.get(member.server.roles,name=addrole)
+    for role in ctx.message.server.roles:
+        if role.name == "overwatch":
+            toprole = role.position
+    for role in ctx.message.server.roles:
+        if role.name == rmvrole and role.position <= toprole and role.position >= 1:
+            validrole = True
+    for role1 in ctx.message.author.roles:
+        alreadyhaveroles.append(str(role1))
+    if rmvrole in alreadyhaveroles:
+        if validrole == True:
+            await bot.remove_roles(ctx.message.author, discord.utils.get(ctx.message.server.roles,name=rmvrole))
+            #await bot.add_reaction(ctx.message, emoji)
+    else:
+        pass
+            #await bot.add_reaction(ctx.message, emoji)
 
 @bot.command(pass_context=True)
 async def checkmember(ctx):
@@ -140,14 +186,13 @@ async def checkmember(ctx):
                 #await bot.say("Added Member role to "+member.name)
         await bot.say(str(notverified) + " do not have the Member role")
 
-"""
+
 @bot.command(pass_context=True)
 async def test22(ctx):
     if is_admin(ctx):
-        await bot.say(discord.utils.get(ctx.message.author.server.roles, name="Member"))
-        await bot.send_message(discord.Object(id='382699994639237120'), "test")
-        await bot.add_roles(ctx.message.author,discord.utils.get(ctx.message.author.server.roles, name="overwatch"))
-"""
+        for role in ctx.message.server.roles:
+            await bot.say(role.name + ":" + str(role.position))
+
 
 @bot.command(pass_context=True)
 async def test33(ctx):
