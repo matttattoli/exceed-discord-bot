@@ -214,6 +214,14 @@ async def purge(ctx, number : int):
         deleted = await bot.purge_from(ctx.message.channel, limit=number+1)
         #await bot.send_message(ctx.message.channel, 'Deleted {} message(s)'.format(len(deleted)))
 
+@bot.command(pass_context=True)
+async def membercount(ctx):
+    await bot.say("This server has {} users connected.".format(ctx.message.server.member_count))
+
+@bot.command(pass_context=True)
+async def ping(ctx):
+    await bot.say(":ping_pong: Pong!")
+
 @bot.listen()
 async def on_member_join(member):
     """is_verified = False
