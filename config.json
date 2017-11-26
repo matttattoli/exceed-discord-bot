@@ -1,9 +1,4 @@
 {
-  "tokens": {
-    "discord": "MzgyNjk1MjE1MjQyMjgwOTYx.DPZc0g.4njwAuT8a5qY8qPc9yVAr8DNrhc",
-    "twitch": "twitch API key"
-  },
-
   "prefix": "$",
 
   "owner_ids": ["117441819180007431"],

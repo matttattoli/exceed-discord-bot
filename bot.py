@@ -3,7 +3,7 @@ import asyncio
 import aiohttp
 from discord.ext.commands import Bot
 from discord.ext import commands
-from config import config
+from config import *
 import platform
 import sys
 import json
@@ -17,6 +17,7 @@ from cogs.utils.checks import *
 bot = Bot(description=config["description"], command_prefix=config["prefix"], pm_help=True)
 xredemoji = '\N{CROSS MARK}'
 checkmarkemoji = '\N{WHITE HEAVY CHECK MARK}'
+
 
 @bot.event
 async def on_ready():
@@ -297,4 +298,4 @@ async def on_member_join(member):
     await bot.add_roles(member, discord.utils.get(member.server.roles, name="Member"))
 
 
-bot.run(config["tokens"]["discord"], bot=True, reconnect=True)
+bot.run(privateconfig["tokens"]["discord"], bot=True, reconnect=True)
