@@ -15,7 +15,8 @@ from cogs.utils.checks import *
         super().__init__(*args, **kwargs)"""
 
 bot = Bot(description=config["description"], command_prefix=config["prefix"], pm_help=True)
-
+xredemoji = '\N{CROSS MARK}'
+checkmarkemoji = '\N{WHITE HEAVY CHECK MARK}'
 
 @bot.event
 async def on_ready():
@@ -25,8 +26,8 @@ async def on_ready():
     print('Use this link to invite {}:'.format(bot.user.name))
     print('https://discordapp.com/oauth2/authorize?client_id={}&scope=bot&permissions=8'.format(bot.user.id))
     print('Current Discord.py Version: {} | Current Python Version: {}'.format(discord.__version__, platform.python_version()))
-    await bot.change_presence(game=discord.Game(name="What do you want?"))
     await bot.change_presence(status=discord.Status.online)
+    await bot.change_presence(game=discord.Game(name="What do you want?"))
 
 
 @bot.command(pass_context=True)
@@ -53,18 +54,13 @@ async def setgame(ctx, *, setgameto: str):
 @bot.command(pass_context=True)
 async def setstatus(ctx, setstatusto: str):
     if is_admin(ctx):
-        # setstatusto = ctx.message.content.split(" ")[1]
         if setstatusto == 'online' or setstatusto == 'on':
-            # await bot.say("going online")
             await bot.change_presence(status=discord.Status.online)
         elif setstatusto == 'invisible' or setstatusto == 'inv' or setstatusto == 'invis':
-            # await bot.say("going invisible")
             await bot.change_presence(status=discord.Status.invisible)
         elif setstatusto == 'idle':
-            # await bot.say("going idle")
             await bot.change_presence(status=discord.Status.idle)
         elif setstatusto == 'dnd' or setstatusto == 'donotdisturb' or setstatusto == 'do not disturb':
-            # await bot.say("going dnd")
             await bot.change_presence(status=discord.Status.dnd)
 
 
@@ -203,8 +199,9 @@ async def checkmember(ctx):
 @bot.command(pass_context=True)
 async def test22(ctx):
     if is_admin(ctx):
-        for role in ctx.message.server.roles:
-            await bot.say(role.name + ":" + str(role.position))
+        pass
+        await bot.say(ctx.message.server.me.status)
+        # bot.say(ctx.message.server.me.status)
 
 
 @bot.command(pass_context=True)
@@ -246,6 +243,43 @@ async def randomcolor():
     embed = discord.Embed(color=randycolor, description=str(randycolor))
     await bot.say("Color: " + str(randycolor))
     await bot.say(embed=embed)
+
+
+@bot.command(pass_context=True, aliases=["newrole"])
+async def createrole(ctx, *, rolename: str):
+    if is_admin(ctx):
+        currentroles = []
+        for role in ctx.message.server.roles:
+            currentroles.append(role.name.lower())
+        if rolename.lower() not in currentroles:
+            await bot.create_role(ctx.message.server, name=rolename, mentionable=True, hoist=False, reason="New Game Role")
+            await bot.add_reaction(ctx.message, emoji=checkmarkemoji)
+        else:
+            await bot.add_reaction(ctx.message, emoji=xredemoji)
+    else:
+        await bot.add_reaction(ctx.message, emoji=xredemoji)
+
+
+@bot.command(pass_context=True)
+async def deleterole(ctx, *, rolename: str):
+    if is_admin(ctx):
+        currentroles = []
+        toprole = 0
+        validrole = False
+        for role in ctx.message.server.roles:
+            currentroles.append(role.name.lower())
+            if role.name == 'overwatch':
+                toprole = role.position
+        for role in ctx.message.server.roles:
+            if role.name == rolename and role.position <= toprole:
+                validrole = True
+        if rolename.lower() in currentroles and validrole:
+            await bot.delete_role(ctx.message.server, discord.utils.get(ctx.message.server.roles, name=rolename))
+            await bot.add_reaction(ctx.message, emoji=checkmarkemoji)
+        else:
+            await bot.add_reaction(ctx.message, emoji=xredemoji)
+    else:
+        await bot.add_reaction(ctx.message, emoji=xredemoji)
 
 
 @bot.listen()
