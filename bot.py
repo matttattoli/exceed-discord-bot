@@ -24,8 +24,7 @@ async def on_ready():
     print('------')
     print('Use this link to invite {}:'.format(bot.user.name))
     print('https://discordapp.com/oauth2/authorize?client_id={}&scope=bot&permissions=8'.format(bot.user.id))
-    print('Current Discord.py Version: {} | Current Python Version: {}'.format(discord.__version__,
-                                                                               platform.python_version()))
+    print('Current Discord.py Version: {} | Current Python Version: {}'.format(discord.__version__, platform.python_version()))
     await bot.change_presence(game=discord.Game(name="What do you want?"))
     await bot.change_presence(status=discord.Status.online)
 
@@ -45,27 +44,27 @@ async def hey():
 
 
 @bot.command(pass_context=True)
-async def setgame(ctx):
+async def setgame(ctx, *, setgameto: str):
     if is_admin(ctx):
-        setgameto = ctx.message.content[len(str(config["prefix"])) + 7:]
+        # setgameto = ctx.message.content[len(str(config["prefix"])) + 7:]
         await bot.change_presence(game=discord.Game(name=setgameto))
 
 
 @bot.command(pass_context=True)
-async def setstatus(ctx):
+async def setstatus(ctx, setstatusto: str):
     if is_admin(ctx):
-        setstatusto = ctx.message.content.split(" ")[1]
+        # setstatusto = ctx.message.content.split(" ")[1]
         if setstatusto == 'online' or setstatusto == 'on':
-            await bot.say("going online")
+            # await bot.say("going online")
             await bot.change_presence(status=discord.Status.online)
         elif setstatusto == 'invisible' or setstatusto == 'inv' or setstatusto == 'invis':
-            await bot.say("going invisible")
+            # await bot.say("going invisible")
             await bot.change_presence(status=discord.Status.invisible)
         elif setstatusto == 'idle':
-            await bot.say("going idle")
+            # await bot.say("going idle")
             await bot.change_presence(status=discord.Status.idle)
         elif setstatusto == 'dnd' or setstatusto == 'donotdisturb' or setstatusto == 'do not disturb':
-            await bot.say("going dnd")
+            # await bot.say("going dnd")
             await bot.change_presence(status=discord.Status.dnd)
 
 
@@ -135,7 +134,7 @@ async def removerole(ctx):
 
 
 @bot.command(pass_context=True, aliases=["addrole"])
-async def getrole(ctx, addrole: str):
+async def getrole(ctx, *, addrole: str):
     # role = ctx.message.content[len(str(config["prefix"]))+8:]
     alreadyhaveroles = []
     validrole = False
@@ -150,16 +149,18 @@ async def getrole(ctx, addrole: str):
     for role1 in ctx.message.author.roles:
         alreadyhaveroles.append(str(role1))
     if addrole in alreadyhaveroles:
-        # await bot.add_reaction(ctx.message, emoji)
+        await bot.add_reaction(ctx.message, emoji='\N{CROSS MARK}')
         pass
     else:
         if validrole:
             await bot.add_roles(ctx.message.author, discord.utils.get(ctx.message.server.roles, name=addrole))
-            # await bot.add_reaction(ctx.message, emoji)
+            await bot.add_reaction(ctx.message, emoji='\N{WHITE HEAVY CHECK MARK}')
+        else:
+            await bot.add_reaction(ctx.message, emoji='\N{CROSS MARK}')
 
 
 @bot.command(pass_context=True, aliases=["rmvrole"])
-async def removerole(ctx, rmvrole: str):
+async def removerole(ctx, *, rmvrole: str):
     # role = ctx.message.content[len(str(config["prefix"]))+8:]
     alreadyhaveroles = []
     validrole = False
@@ -176,10 +177,10 @@ async def removerole(ctx, rmvrole: str):
     if rmvrole in alreadyhaveroles:
         if validrole:
             await bot.remove_roles(ctx.message.author, discord.utils.get(ctx.message.server.roles, name=rmvrole))
-            # await bot.add_reaction(ctx.message, emoji)
+            await bot.add_reaction(ctx.message, emoji='\N{WHITE HEAVY CHECK MARK}')
     else:
         pass
-        # await bot.add_reaction(ctx.message, emoji)
+        await bot.add_reaction(ctx.message, emoji='\N{CROSS MARK}')
 
 
 @bot.command(pass_context=True)
@@ -192,7 +193,7 @@ async def checkmember(ctx):
                 if role.name == "Member":
                     is_verified = True
                     break
-            if is_verified == False:
+            if not is_verified:
                 # await bot.add_roles(member, discord.utils.get(ctx.message.server.roles,name="Member"))
                 notverified.append(str(member))
                 # await bot.say("Added Member role to "+member.name)
