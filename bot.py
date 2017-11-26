@@ -240,6 +240,14 @@ async def ping():
     await bot.say(":ping_pong: Pong!")
 
 
+@bot.command()
+async def randomcolor():
+    randycolor = discord.Color(randint(0x000000, 0xFFFFFF))
+    embed = discord.Embed(color=randycolor, description=str(randycolor))
+    await bot.say("Color: " + str(randycolor))
+    await bot.say(embed=embed)
+
+
 @bot.listen()
 async def on_member_join(member):
     """is_verified = False
