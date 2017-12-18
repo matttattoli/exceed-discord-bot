@@ -19,8 +19,8 @@ class PublicCmds:
             await self.bot.say("Heads")
 
     @commands.command()
-    async def pick(self, *choices: str):
-        await self.bot.say(random.choice(choices))
+    async def pick(self, *pick: str):
+        await self.bot.say(pick[randint(0, int(pick.__len__()-1))])
 
     @commands.command(pass_context=True, aliases=["addrole"])
     async def getrole(self, ctx, *, addrole: str):
@@ -74,17 +74,15 @@ class PublicCmds:
     async def membercount(self, ctx):
         await self.bot.say("This server has {} users connected.".format(ctx.message.server.member_count))
 
-
     @commands.command()
     async def ping(self):
         await self.bot.say(":ping_pong: Pong!")
 
-
     @commands.command()
     async def randomcolor(self):
         randycolor = discord.Color(randint(0x000000, 0xFFFFFF))
-        embed = discord.Embed(color=randycolor, description=str(randycolor))
-        await self.bot.say("Color: " + str(randycolor))
+        embed = discord.Embed(color=randycolor, description="Color: " + str(randycolor))
+        # await self.bot.say("Color: " + str(randycolor))
         await self.bot.say(embed=embed)
 
 

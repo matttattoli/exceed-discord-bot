@@ -4,9 +4,7 @@ from discord.ext import commands
 import platform
 import sys
 from cogs.utils.checks import *
-
-xredemoji = '\N{CROSS MARK}'
-checkmarkemoji = '\N{WHITE HEAVY CHECK MARK}'
+from cogs.utils.Emojis import *
 
 
 class AdminCmds:
@@ -15,7 +13,7 @@ class AdminCmds:
 
     @commands.command(pass_context=True, hidden=True)
     async def roles(self, ctx):
-        if is_admin(ctx):
+        if is_owner(ctx):
             await self.bot.say(ctx.message.author.name + ":" + ctx.message.author.id)
             for role in ctx.message.server.roles:
                 await self.bot.say(role.name + ":" + role.id)
@@ -23,12 +21,12 @@ class AdminCmds:
 
     @commands.command(pass_context=True, hidden=True)
     async def setgame(self, ctx, *, setgameto: str):
-        if is_admin(ctx):
+        if is_owner(ctx):
             await self.bot.change_presence(game=discord.Game(name=setgameto))
 
     @commands.command(pass_context=True)
     async def setstatus(self, ctx, setstatusto: str):
-        if is_admin(ctx):
+        if is_owner(ctx):
             if setstatusto == 'online' or setstatusto == 'on':
                 await self.bot.change_presence(status=discord.Status.online, game=discord.Game(name=str(ctx.message.server.me.game)))
             elif setstatusto == 'invisible' or setstatusto == 'inv' or setstatusto == 'invis':
@@ -40,7 +38,7 @@ class AdminCmds:
 
     @commands.command(pass_context=True, hidden=True)
     async def killbot(self, ctx):
-        if is_admin(ctx):
+        if is_owner(ctx):
             await self.bot.say("Bang bang :gun:")
             await self.bot.say("Bot Killed!")
             await self.bot.change_presence(game=discord.Game(name="KILLED!"))
@@ -103,6 +101,7 @@ class AdminCmds:
                 await self.bot.add_reaction(ctx.message, emoji=xredemoji)
         else:
             await self.bot.add_reaction(ctx.message, emoji=xredemoji)
+
 
 def setup(bot):
     bot.add_cog(AdminCmds(bot))
