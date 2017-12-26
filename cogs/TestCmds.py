@@ -51,9 +51,6 @@ class TestCmds:
                 await self.bot.say(mem.mention)
 
 
-
-
-
 def setup(bot):
     bot.add_cog(TestCmds(bot))
 

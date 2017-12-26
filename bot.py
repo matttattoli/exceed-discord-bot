@@ -13,7 +13,7 @@ from cogs.utils.checks import *
 from cogs.utils.Emojis import *
 
 bot = Bot(description=config["description"], command_prefix=config["prefix"], pm_help=True)
-startup_extensions = ["cogs.PublicCmds", "cogs.AdminCmds", "cogs.TestCmds"]
+startup_extensions = ["cogs.PublicCmds", "cogs.AdminCmds", "cogs.OwnerCmds", "cogs.TestCmds"]
 
 
 @bot.event
@@ -66,6 +66,12 @@ async def _reloadall(ctx):
 
 
 @bot.command(pass_context=True, hidden=True)
+async def adminhelp(ctx):
+    if is_admin(ctx):
+        pass
+
+
+@bot.command(pass_context=True, hidden=True)
 async def unload(ctx, extension_name: str):
     if is_owner(ctx):
             bot.unload_extension(extension_name)
@@ -76,6 +82,7 @@ async def unload(ctx, extension_name: str):
 async def on_member_join(member):
     await bot.send_message(discord.Object(id='382699994639237120'), str(member) + " has joined the server")
     await bot.add_roles(member, discord.utils.get(member.server.roles, name="Member"))
+
 
 if __name__ == "__main__":
     for extension in startup_extensions:
