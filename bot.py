@@ -10,16 +10,16 @@ import json
 from random import *
 import traceback
 from cogs.utils.checks import *
-from cogs.utils.Emojis import *
-
-bot = Bot(description=config["description"], command_prefix=config["prefix"], pm_help=True)
+from cogs.utils.GlobalVars import *
+from cogs.utils.debug import *
+description = "Pro bot to EXCEED your imagination"
+bot = Bot(description=description, command_prefix=config["prefix"], pm_help=True)
 startup_extensions = ["cogs.PublicCmds", "cogs.AdminCmds", "cogs.OwnerCmds", "cogs.TestCmds"]
 
 
 @bot.event
 async def on_ready():
-    print('Logged in as ' + bot.user.name + ' (ID:' + bot.user.id + ') | Connected to ' + str(
-        len(bot.servers)) + ' servers | Connected to ' + str(len(set(bot.get_all_members()))) + ' users')
+    print('Logged in as ' + bot.user.name + ' (ID:' + str(bot.user.id) + ') | Connected to ' + str(len(bot.guilds)) + ' servers | Connected to ' + str(len(set(bot.get_all_members()))) + ' users')
     print('------')
     print('Use this link to invite {}:'.format(bot.user.name))
     print('https://discordapp.com/oauth2/authorize?client_id={}&scope=bot&permissions=8'.format(bot.user.id))
@@ -27,7 +27,7 @@ async def on_ready():
     await bot.change_presence(game=discord.Game(name="What do you want?"), status=discord.Status.online)
 
 
-@bot.command(pass_context=True, hidden=True)
+@bot.command(hidden=True)
 async def load(ctx, extension_name: str):
     if is_owner(ctx):
         try:
@@ -38,20 +38,21 @@ async def load(ctx, extension_name: str):
         print("{} loaded.".format(extension_name))
 
 
-@bot.command(name='reload', pass_context=True, hidden=True)
+@bot.command(name='reload', hidden=True)
 async def _reload(ctx, module: str):
     if is_owner(ctx):
         """Reloads a module."""
         try:
             bot.unload_extension(module)
             bot.load_extension(module)
+            debug_print(str(module))
         except Exception as e:
-            await bot.say(f'```py\n{traceback.format_exc()}\n```')
+            await ctx.send(f'```py\n{traceback.format_exc()}\n```')
         else:
-            await bot.add_reaction(ctx.message, '\N{OK HAND SIGN}')
+            await ctx.message.add_reaction('\N{OK HAND SIGN}')
 
 
-@bot.command(name='reloadall', pass_context=True, hidden=True)
+@bot.command(name='reloadall', hidden=True)
 async def _reloadall(ctx):
     if is_owner(ctx):
         """Reloads a module."""
@@ -59,19 +60,20 @@ async def _reloadall(ctx):
         try:
             bot.unload_extension('cogs.' + module)
             bot.load_extension('cogs.' + module)
+            debug_print('cogs.{}'.format(module))
         except Exception as e:
-            await bot.say(f'```py\n{traceback.format_exc()}\n```')
+            await ctx.send(f'```py\n{traceback.format_exc()}\n```')
         else:
-            await bot.add_reaction(ctx.message, '\N{OK HAND SIGN}')
+            await ctx.message.add_reaction('\N{OK HAND SIGN}')
 
 
-@bot.command(pass_context=True, hidden=True)
+@bot.command(hidden=True)
 async def adminhelp(ctx):
     if is_admin(ctx):
         pass
 
 
-@bot.command(pass_context=True, hidden=True)
+@bot.command(hidden=True)
 async def unload(ctx, extension_name: str):
     if is_owner(ctx):
             bot.unload_extension(extension_name)
@@ -80,8 +82,8 @@ async def unload(ctx, extension_name: str):
 
 @bot.listen()
 async def on_member_join(member):
-    await bot.send_message(discord.Object(id='382699994639237120'), str(member) + " has joined the server")
-    await bot.add_roles(member, discord.utils.get(member.server.roles, name="Member"))
+    await bot.get_channel(382699994639237120).send(str(member) + " has joined the server.")
+    await member.add_roles(discord.utils.get(member.guild.roles, name="Member"))
 
 
 if __name__ == "__main__":

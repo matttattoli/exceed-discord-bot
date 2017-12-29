@@ -1,7 +1,7 @@
 {
   "prefix": "$",
 
-  "owner_ids": ["117441819180007431"],
+  "owner_ids": [117441819180007431],
 
   "active_extensions": [
     "cogs.voice_toggle",
