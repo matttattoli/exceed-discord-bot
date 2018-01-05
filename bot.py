@@ -19,6 +19,7 @@ startup_extensions = ["cogs.PublicCmds", "cogs.AdminCmds", "cogs.OwnerCmds", "co
 
 @bot.event
 async def on_ready():
+    print('**********************************************************************')
     print('Logged in as ' + bot.user.name + ' (ID:' + str(bot.user.id) + ') | Connected to ' + str(len(bot.guilds)) + ' servers | Connected to ' + str(len(set(bot.get_all_members()))) + ' users')
     print('------')
     print('Use this link to invite {}:'.format(bot.user.name))
@@ -28,34 +29,34 @@ async def on_ready():
 
 
 @bot.command(hidden=True)
+@commands.is_owner()
 async def load(ctx, extension_name: str):
-    if is_owner(ctx):
-        try:
-            bot.load_extension(extension_name)
-        except (AttributeError, ImportError) as e:
-            print("{}: {}".format(type(e).__name__, str(e)))
-            return
-        print("{} loaded.".format(extension_name))
+    try:
+        bot.load_extension(extension_name)
+    except (AttributeError, ImportError) as e:
+        print("{}: {}".format(type(e).__name__, str(e)))
+        return
+    print("{} loaded.".format(extension_name))
 
 
 @bot.command(name='reload', hidden=True)
+@commands.is_owner()
 async def _reload(ctx, module: str):
-    if is_owner(ctx):
-        """Reloads a module."""
-        try:
-            bot.unload_extension(module)
-            bot.load_extension(module)
-            debug_print(str(module))
-        except Exception as e:
-            await ctx.send(f'```py\n{traceback.format_exc()}\n```')
-        else:
-            await ctx.message.add_reaction('\N{OK HAND SIGN}')
+    """Reloads a module."""
+    try:
+        bot.unload_extension(module)
+        bot.load_extension(module)
+        debug_print(str(module))
+    except Exception as e:
+        await ctx.send(f'```py\n{traceback.format_exc()}\n```')
+    else:
+        await ctx.message.add_reaction('\N{OK HAND SIGN}')
 
 
 @bot.command(name='reloadall', hidden=True)
+@commands.is_owner()
 async def _reloadall(ctx):
-    if is_owner(ctx):
-        """Reloads a module."""
+    """Reloads a module."""
     for module in bot.cogs:
         try:
             bot.unload_extension('cogs.' + module)
@@ -68,23 +69,82 @@ async def _reloadall(ctx):
 
 
 @bot.command(hidden=True)
+@commands.check(is_admin)
 async def adminhelp(ctx):
-    if is_admin(ctx):
-        pass
+    cmdlist = {}
+    for cmd in bot.get_cog_commands('AdminCmds'):
+        cmdlist[cmd.name] = cmd.aliases
+    await ctx.author.send(cmdlist)
 
 
 @bot.command(hidden=True)
+@commands.is_owner()
 async def unload(ctx, extension_name: str):
-    if is_owner(ctx):
-            bot.unload_extension(extension_name)
-            print("{} unloaded.".format(extension_name))
+        bot.unload_extension(extension_name)
+        print("{} unloaded.".format(extension_name))
 
 
 @bot.listen()
 async def on_member_join(member):
-    await bot.get_channel(382699994639237120).send(str(member) + " has joined the server.")
+    await bot.get_channel(397902146382725131).send(str(member) + " has joined the server.")
     await member.add_roles(discord.utils.get(member.guild.roles, name="Member"))
 
+
+@bot.listen()
+async def on_member_remove(member):
+    await bot.get_channel(397902146382725131).send(str(member) + " has left the server.")
+
+
+@bot.listen()
+async def on_guild_channel_create(channel):
+    await bot.get_channel(397902146382725131).send("{} {} has been created.".format(str(type(channel)).split('.')[2][:-2], channel.name))
+
+
+@bot.listen()
+async def on_guild_channel_delete(channel):
+    await bot.get_channel(397902146382725131).send("{} {} has been deleted.".format(str(type(channel)).split('.')[2][:-2], channel.name))
+
+
+@bot.listen()
+async def on_guild_role_create(role):
+    await bot.get_channel(397902146382725131).send("Role {} has been created.".format(role.name))
+
+
+@bot.listen()
+async def on_guild_role_delete(role):
+    await bot.get_channel(397902146382725131).send("Role {} has been deleted.".format(role.name))
+
+
+@bot.listen()
+async def on_member_update(before, after):
+    descr = ''
+    if not before.display_name == after.display_name:
+        descr = "Name changed from {} to {}".format(before.display_name, after.display_name)
+    if not str(before.roles) == str(after.roles):
+        print(before.roles)
+        changedrole = str(set(before.roles) ^ set(after.roles))
+        changedrole = changedrole.split('\'')[1]
+        if changedrole in str(before.roles):
+            changedrole = changedrole + ' has been removed.'
+        else:
+            changedrole = changedrole + ' has been added.'
+        if not descr == '':
+            descr = descr + "\n Role {}".format(changedrole)
+        else:
+            descr = "Role " + changedrole
+    if not descr == '':
+        embed = discord.Embed(title="User {} : {} has been updated.".format(str(before), before.id), description=descr)
+        await bot.get_channel(397902146382725131).send(embed=embed)
+
+
+@bot.listen()
+async def on_member_ban(guild, user):
+    await bot.get_channel(397902146382725131).send('User {} : {} has been banned.'.format(str(user), user.id))
+
+
+@bot.listen()
+async def on_member_unban(guild, user):
+    await bot.get_channel(397902146382725131).send('User {} : {} has been unbanned.'.format(str(user), user.id))
 
 if __name__ == "__main__":
     for extension in startup_extensions:

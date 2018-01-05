@@ -3,11 +3,16 @@ import sys
 from discord.ext import commands
 from random import *
 from cogs.utils.GlobalVars import *
+import time
 
 
 class PublicCmds:
     def __init__(self, bot):
         self.bot = bot
+
+    @commands.command()
+    async def shelp(self, ctx):
+        await ctx.send("```This is just a test\nwondering if this will work\nand if this is 3 lines```")
 
     @commands.command(aliases=["flip", "coin", "cointoss"])
     async def flipcoin(self, ctx):
@@ -78,7 +83,11 @@ class PublicCmds:
 
     @commands.command()
     async def ping(self, ctx):
-        await ctx.send(":ping_pong: Pong!")
+        """Calculates the ping time."""
+        t1 = time.perf_counter()
+        await ctx.trigger_typing()
+        t2 = time.perf_counter()
+        await ctx.send("Pong.\nTime: " + str(round((t2-t1)*1000)) + "ms")
 
     @commands.command()
     async def randomcolor(self, ctx):
