@@ -6,6 +6,7 @@ from cogs.utils.GlobalVars import *
 from cogs.utils.checks import *
 from testdict import *
 from cogs.utils.debug import *
+import asyncio
 
 
 class TestCmds:
@@ -41,6 +42,28 @@ class TestCmds:
         f = open('testdict.py', 'w')
         f.write('testlist = ' + str(testlist))
         f.close()
+
+
+"""
+    @commands.command(hidden=True)
+    @commands.check(is_admin)
+    async def wank(self, ctx, ww: str):
+        times = 1
+        if ww == 'slow':
+            times = 0.3
+        elif ww == 'fast':
+            times = 0.1
+        msg = await ctx.send('8=mm===D')
+        for i in range(100):
+            await msg.edit(content='8=mm===D')
+            await asyncio.sleep(times)
+            await msg.edit(content='8==mm==D')
+            await asyncio.sleep(times)
+            await msg.edit(content='8===mm=D')
+            await asyncio.sleep(times)
+            await msg.edit(content='8==mm==D')
+            await asyncio.sleep(times)
+"""
 
 
 """

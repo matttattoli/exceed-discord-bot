@@ -6,11 +6,17 @@ import sys
 from cogs.utils.checks import *
 from cogs.utils.GlobalVars import *
 from cogs.utils.debug import *
+import asyncio
 
 
 class OwnerCmds:
     def __init__(self, bot):
         self.bot = bot
+
+    @commands.command(hidden=True)
+    @commands.check(is_owner)
+    async def exec(self, ctx, code: str):
+        exec(code)
 
     @commands.command(hidden=True)
     @commands.check(is_owner)
@@ -94,21 +100,20 @@ class OwnerCmds:
     @commands.command(hidden=True)
     @commands.is_owner()
     async def playa(self, ctx, src: str=None):
-        ctx.voice_client.play(src)
+        await ctx.voice_client.play(src)
 
     @commands.command(hidden=True)
     @commands.is_owner()
     async def stopa(self, ctx):
-        ctx.me.stop()
+        await ctx.me.stop()
 
-
-"""
     # TODO: maybe something to move people around voice channels
     @commands.command(hidden=True)
-    async def fmove(self, ctx, user: discord.Member, room: discord.VoiceChannel):
-        if is_owner(ctx):
-            user.edit(voice_channel=room)
-"""
+    @commands.is_owner()
+    async def fmove(self, ctx, user: discord.Member, room: discord.VoiceChannel, amount: int=1):
+        for i in range(amount):
+            await user.move_to(room)
+            await asyncio.sleep(1)
 
 
 def setup(bot):

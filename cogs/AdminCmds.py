@@ -65,6 +65,11 @@ class AdminCmds:
         else:
             await ctx.message.add_reaction(emoji=xredemoji)
 
+    @commands.command(hidden=True)
+    @commands.check(is_admin)
+    async def setlogchannel(self, ctx):
+        pass
+
 
 def setup(bot):
     bot.add_cog(AdminCmds(bot))

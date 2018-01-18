@@ -12,6 +12,7 @@ import traceback
 from cogs.utils.checks import *
 from cogs.utils.GlobalVars import *
 from cogs.utils.debug import *
+from cogs.utils.GuildSpecific import *
 description = "Pro bot to EXCEED your imagination"
 bot = Bot(description=description, command_prefix=config["prefix"], pm_help=True)
 startup_extensions = ["cogs.PublicCmds", "cogs.AdminCmds", "cogs.OwnerCmds", "cogs.TestCmds"]
@@ -121,7 +122,6 @@ async def on_member_update(before, after):
     if not before.display_name == after.display_name:
         descr = "Name changed from {} to {}".format(before.display_name, after.display_name)
     if not str(before.roles) == str(after.roles):
-        print(before.roles)
         changedrole = str(set(before.roles) ^ set(after.roles))
         changedrole = changedrole.split('\'')[1]
         if changedrole in str(before.roles):
