@@ -15,17 +15,19 @@ from cogs.utils.debug import *
 from cogs.utils.GuildSpecific import *
 description = "Pro bot to EXCEED your imagination"
 bot = Bot(description=description, command_prefix=config["prefix"], pm_help=True)
-startup_extensions = ["cogs.PublicCmds", "cogs.AdminCmds", "cogs.OwnerCmds", "cogs.TestCmds"]
+startup_extensions = ("cogs.PublicCmds", "cogs.AdminCmds", "cogs.OwnerCmds", "cogs.TestCmds")
 
 
 @bot.event
 async def on_ready():
     print('**********************************************************************')
-    print('Logged in as ' + bot.user.name + ' (ID:' + str(bot.user.id) + ') | Connected to ' + str(len(bot.guilds)) + ' servers | Connected to ' + str(len(set(bot.get_all_members()))) + ' users')
+    print('Logged in as ' + bot.user.name + ' (ID:' + str(bot.user.id) + ') | Connected to ' + str(len(bot.guilds)) +
+          ' servers | Connected to ' + str(len(set(bot.get_all_members()))) + ' users')
     print('------')
     print('Use this link to invite {}:'.format(bot.user.name))
     print('https://discordapp.com/oauth2/authorize?client_id={}&scope=bot&permissions=8'.format(bot.user.id))
-    print('Current Discord.py Version: {} | Current Python Version: {}'.format(discord.__version__, platform.python_version()))
+    print('Current Discord.py Version: {} | Current Python Version: {}'.format(discord.__version__,
+                                                                               platform.python_version()))
     await bot.change_presence(game=discord.Game(name="What do you want?"), status=discord.Status.online)
 
 
@@ -59,10 +61,10 @@ async def _reload(ctx, module: str):
 async def _reloadall(ctx):
     """Reloads a module."""
     for module in bot.cogs:
+        debug_print('cogs.{}'.format(module))
         try:
             bot.unload_extension('cogs.' + module)
             bot.load_extension('cogs.' + module)
-            debug_print('cogs.{}'.format(module))
         except Exception as e:
             await ctx.send(f'```py\n{traceback.format_exc()}\n```')
         else:
@@ -79,6 +81,17 @@ async def adminhelp(ctx):
 
 
 @bot.command(hidden=True)
+@commands.check(is_owner)
+async def ownerhelp(ctx):
+    cmdlist = {}
+    for cmd in bot.get_cog_commands('OwnerCmds'):
+        cmdlist[cmd.name] = cmd.aliases
+    for cmd in bot.get_cog_commands('TestCmds'):
+        cmdlist[cmd.name] = cmd.aliases
+    await ctx.author.send(cmdlist)
+
+
+@bot.command(hidden=True)
 @commands.is_owner()
 async def unload(ctx, extension_name: str):
         bot.unload_extension(extension_name)
@@ -86,37 +99,51 @@ async def unload(ctx, extension_name: str):
 
 
 @bot.listen()
+@commands.check(has_log_enabled)
 async def on_member_join(member):
-    await bot.get_channel(397902146382725131).send(str(member) + " has joined the server.")
+    await bot.get_channel(getGuildLogChannel(member.guild.id)).send(str(member) + " has joined the server.")
     await member.add_roles(discord.utils.get(member.guild.roles, name="Member"))
 
 
 @bot.listen()
+@commands.check(has_log_enabled)
 async def on_member_remove(member):
-    await bot.get_channel(397902146382725131).send(str(member) + " has left the server.")
+    await bot.get_channel(getGuildLogChannel(member.guild.id)).send(str(member) + " has left the server.")
 
 
 @bot.listen()
+async def on_guild_join(guild):
+    addNewGuild(guild.id)
+
+
+@bot.listen()
+@commands.check(has_log_enabled)
 async def on_guild_channel_create(channel):
-    await bot.get_channel(397902146382725131).send("{} {} has been created.".format(str(type(channel)).split('.')[2][:-2], channel.name))
+    await bot.get_channel(getGuildLogChannel(channel.guild.id)).send(
+        "{} {} has been created.".format(str(type(channel)).split('.')[2][:-2], channel.name))
 
 
 @bot.listen()
+@commands.check(has_log_enabled)
 async def on_guild_channel_delete(channel):
-    await bot.get_channel(397902146382725131).send("{} {} has been deleted.".format(str(type(channel)).split('.')[2][:-2], channel.name))
+    await bot.get_channel(getGuildLogChannel(channel.guild.id)).send(
+        "{} {} has been deleted.".format(str(type(channel)).split('.')[2][:-2], channel.name))
 
 
 @bot.listen()
+@commands.check(has_log_enabled)
 async def on_guild_role_create(role):
-    await bot.get_channel(397902146382725131).send("Role {} has been created.".format(role.name))
+    await bot.get_channel(getGuildLogChannel(role.guild.id)).send("Role {} has been created.".format(role.name))
 
 
 @bot.listen()
+@commands.check(has_log_enabled)
 async def on_guild_role_delete(role):
-    await bot.get_channel(397902146382725131).send("Role {} has been deleted.".format(role.name))
+    await bot.get_channel(getGuildLogChannel(role.guild.id)).send("Role {} has been deleted.".format(role.name))
 
 
 @bot.listen()
+@commands.check(has_log_enabled)
 async def on_member_update(before, after):
     descr = ''
     if not before.display_name == after.display_name:
@@ -134,17 +161,20 @@ async def on_member_update(before, after):
             descr = "Role " + changedrole
     if not descr == '':
         embed = discord.Embed(title="User {} : {} has been updated.".format(str(before), before.id), description=descr)
-        await bot.get_channel(397902146382725131).send(embed=embed)
+        await bot.get_channel(getGuildLogChannel(before.guild.id)).send(embed=embed)
 
 
 @bot.listen()
+@commands.check(has_log_enabled)
 async def on_member_ban(guild, user):
-    await bot.get_channel(397902146382725131).send('User {} : {} has been banned.'.format(str(user), user.id))
+    await bot.get_channel(getGuildLogChannel(guild.id)).send('User {} : {} has been banned.'.format(str(user), user.id))
 
 
 @bot.listen()
+@commands.check(has_log_enabled)
 async def on_member_unban(guild, user):
-    await bot.get_channel(397902146382725131).send('User {} : {} has been unbanned.'.format(str(user), user.id))
+    await bot.get_channel(getGuildLogChannel(guild.id)).send('User {} : {} has been unbanned.'.format(str(user),
+                                                                                                      user.id))
 
 if __name__ == "__main__":
     for extension in startup_extensions:

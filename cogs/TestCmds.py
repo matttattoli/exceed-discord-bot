@@ -4,7 +4,6 @@ import platform
 import sys
 from cogs.utils.GlobalVars import *
 from cogs.utils.checks import *
-from testdict import *
 from cogs.utils.debug import *
 import asyncio
 
@@ -22,26 +21,6 @@ class TestCmds:
     @commands.check(is_owner)
     async def test2(self, ctx):
         await ctx.send(str(self.bot.emojis))
-
-    @commands.command(hidden=True)
-    @commands.check(is_owner)
-    async def test3(self, ctx):
-        await ctx.send(str(testlist))
-
-    @commands.command(hidden=True)
-    @commands.check(is_owner)
-    async def test4(self, ctx, appnd: str):
-        testlist.append(appnd)
-        f = open('testdict.py', 'w')
-        f.write('testlist = ' + str(testlist))
-        f.close()
-
-    @commands.command(hidden=True)
-    @commands.check(is_owner)
-    async def test5(self, ctx):
-        f = open('testdict.py', 'w')
-        f.write('testlist = ' + str(testlist))
-        f.close()
 
 
 """

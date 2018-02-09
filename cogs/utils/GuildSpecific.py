@@ -1,13 +1,47 @@
 from os import path
-guild_id_file = path.join(path.dirname(__file__), 'GuildLogChannel.dict')
+import json
+eee = path.dirname(__file__).split('/')[:-2]
+guild_id_file = ''
+for i in eee:
+    guild_id_file += i + "/"
+guild_id_file += 'GuildConfigs.json'
 
 
-def getGuildLogChannel(ctx):
-    guild_ids = dict(open(guild_id_file, 'r'))
-    if ctx.guild in guild_ids.keys():
-        return guild_ids[ctx.guild]
+def createfile():
+    if not path.exists(guild_id_file):
+        file = open(guild_id_file, 'w+')
+        file.write("{}")
+        file.close()
 
 
-def setGuildLogChannel(ctx):
-    if path.join(path.dirname(__file__), 'GuildLogChannel.dict'):
-        guild_ids = open(guild_id_file, 'w+')
+def addNewGuild(gid: int):
+    if path.exists(guild_id_file):
+        guild_ids = json.load(open(guild_id_file, 'r'))
+        guild_ids[str(gid)] = {}
+        json.dump(guild_ids, open(guild_id_file, 'w'), indent=4, sort_keys=True)
+    else:
+        createfile()
+
+
+def setGuildLogChannel(gid: int, channel: int):
+    if path.exists(guild_id_file):
+        guild_ids = json.load(open(guild_id_file, 'r'))
+        if str(gid) in guild_ids:
+            guild_ids[str(gid)]["Log_Channel"] = str(channel)
+            json.dump(guild_ids, open(guild_id_file, 'w'), indent=4, sort_keys=True)
+        else:
+            guild_ids = json.load(open(guild_id_file, 'r'))
+            guild_ids[str(gid)] = {}
+            guild_ids[str(gid)]["Log_Channel"] = str(channel)
+            json.dump(guild_ids, open(guild_id_file, 'w'), indent=4, sort_keys=True)
+    else:
+        createfile()
+
+
+def getGuildLogChannel(gid: int):
+    if path.exists(guild_id_file):
+        guild_ids = json.load(open(guild_id_file, 'r'))
+        if str(gid) in guild_ids:
+            return int(guild_ids[str(gid)]["Log_Channel"])
+        else:
+            return None

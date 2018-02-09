@@ -6,6 +6,7 @@ import sys
 from cogs.utils.checks import *
 from cogs.utils.GlobalVars import *
 from cogs.utils.debug import *
+from cogs.utils.GuildSpecific import *
 
 
 class AdminCmds:
@@ -68,7 +69,36 @@ class AdminCmds:
     @commands.command(hidden=True)
     @commands.check(is_admin)
     async def setlogchannel(self, ctx):
-        pass
+        setGuildLogChannel(ctx.guild.id, ctx.channel.id)
+        if getGuildLogChannel(ctx.guild.id) == ctx.channel.id:
+            await ctx.message.add_reaction(emoji=checkmarkemoji)
+        else:
+            await ctx.message.add_reaction(emoji=xredemoji)
+
+    @commands.command(hidden=True)
+    @commands.check(is_admin)
+    async def randomteams(self, ctx, chan1: discord.VoiceChannel, chan2: discord.VoiceChannel,
+                          fromvc: discord.VoiceChannel=None):
+        if fromvc is None:
+            if ctx.author.voice is None:
+                return None
+            fromvc = ctx.author.voice.channel.id
+        memberlist = ctx.guild.get_channel(fromvc).members
+        movememto = []
+        if len(memberlist) < 4:
+            return None
+        for x in range(len(memberlist)):
+            if x >= int(len(memberlist)/2) and movememto.count(0) >= int(len(memberlist) / 2):
+                movememto.append(1)
+            elif x >= int(len(memberlist)/2) and movememto.count(1) >= int(len(memberlist) / 2):
+                movememto.append(0)
+            else:
+                movememto.append(random.randint(0, 1))
+        for x in range(len(memberlist)):
+            if movememto[x] == 0:
+                await memberlist[x].move_to(chan1)
+            elif movememto[x] == 1:
+                await memberlist[x].move_to(chan2)
 
 
 def setup(bot):

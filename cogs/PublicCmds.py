@@ -1,5 +1,7 @@
 import discord
 import sys
+import json
+import urllib.request
 from discord.ext import commands
 from random import *
 from cogs.utils.GlobalVars import *
@@ -25,7 +27,7 @@ class PublicCmds:
     @commands.command()
     async def pick(self, ctx, *pick: str):
         """Randomly picks from a list of arguments given. Ex. pick 1 2 3."""
-        await ctx.send(pick[randint(0, int(pick.__len__()-1))])
+        await ctx.send(pick[randint(0, int(pick.__len__() - 1))])
 
     @commands.command(aliases=["addrole"])
     async def getrole(self, ctx, *, addrole: str):
@@ -87,7 +89,7 @@ class PublicCmds:
         t1 = time.perf_counter()
         await ctx.trigger_typing()
         t2 = time.perf_counter()
-        await ctx.send("Pong.\nTime: " + str(round((t2-t1)*1000)) + "ms")
+        await ctx.send("Pong.\nTime: " + str(round((t2 - t1) * 1000)) + "ms")
 
     @commands.command()
     async def randomcolor(self, ctx):
@@ -108,9 +110,35 @@ class PublicCmds:
                 userrolelist.append("everyone")
             else:
                 userrolelist.append(role.name)
-        embed = discord.Embed(title="Showing user info for: " + mem.display_name + "#" + str(mem.discriminator) + " : " + str(mem.id), description="User Status: {}\nPlaying: {}\nUser Avatar: {}\nUser Joined: {}\nUser Roles: {}".format(str(mem.status), str(mem.game), str(mem.avatar_url), str(mem.joined_at), str(userrolelist)), width=100)
-        embed.set_image(url=mem.avatar_url.replace('size=1024', 'size=64'))
+        embed = discord.Embed(title="Showing user info for: " + mem.display_name + "#" + str(mem.discriminator) + " : "
+                                    + str(mem.id), description="User Status: {}\nPlaying: {}\nUser Avatar: {}\nUser Jo"
+                                                               "ined: {}\nUser Roles: {}".format(str(mem.status),
+                                                                                                 str(mem.game),
+                                                                                                 str(mem.avatar_url_as(
+                                                                                                     static_format='png'
+                                                                                                     ,
+                                                                                                     size=1024)),
+                                                                                                 str(mem.joined_at),
+                                                                                                 str(userrolelist)),
+                              width=100)
+        embed.set_image(url=mem.avatar_url_as(static_format='png', size=64))
         await ctx.send(embed=embed)
+
+    @commands.command()
+    async def checkmc(self, ctx):
+        data = urllib.request.urlopen("https://api.mcsrvstat.us/1/gamfrk.noip.me:7777")
+        data = json.load(data)
+        if "offline" in data:
+            await ctx.send("Server offline")
+        else:
+            embed = discord.Embed(title="Showing server info for Minecraft")
+            embed.add_field(name="IP", value="gamfrk.noip.me:7777", inline=False)
+            if "list" in data["players"]:
+                playersval = "{} - {}".format(data["players"]["online"], data["players"]["list"])
+            else:
+                playersval = data["players"]["online"]
+            embed.add_field(name="Players", value=playersval, inline=False)
+            await ctx.send(embed=embed)
 
 
 def setup(bot):
