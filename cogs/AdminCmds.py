@@ -13,7 +13,7 @@ class AdminCmds:
     def __init__(self, bot):
         self.bot = bot
 
-    @commands.command(hidden=True)
+    @commands.command()
     @commands.check(is_admin)
     async def checkmember(self, ctx):
         notverified = []
@@ -29,13 +29,13 @@ class AdminCmds:
                 # debug_print("Added Member role to " + member.name)
         await ctx.send(str(notverified) + " do not have the Member role")
 
-    @commands.command(hidden=True)
+    @commands.command()
     @commands.check(is_admin)
     async def purge(self, ctx, number: int):
         await ctx.message.channel.purge(limit=number + 1)
         await ctx.send('Deleted {} message(s)'.format(number), delete_after=2.5)
 
-    @commands.command(aliases=["newrole"], hidden=True)
+    @commands.command(aliases=["newrole"])
     @commands.check(is_admin)
     async def createrole(self, ctx, *, rolename: str):
         currentroles = []
@@ -47,7 +47,7 @@ class AdminCmds:
         else:
             await ctx.message.add_reaction(emoji=xredemoji)
 
-    @commands.command(hidden=True)
+    @commands.command()
     @commands.check(is_admin)
     async def deleterole(self, ctx, *, rolename: str):
         currentroles = []
@@ -66,7 +66,7 @@ class AdminCmds:
         else:
             await ctx.message.add_reaction(emoji=xredemoji)
 
-    @commands.command(hidden=True)
+    @commands.command()
     @commands.check(is_admin)
     async def setlogchannel(self, ctx):
         setGuildLogChannel(ctx.guild.id, ctx.channel.id)
@@ -75,10 +75,12 @@ class AdminCmds:
         else:
             await ctx.message.add_reaction(emoji=xredemoji)
 
-    @commands.command(hidden=True)
+    @commands.command()
     @commands.check(is_admin)
     async def randomteams(self, ctx, chan1: discord.VoiceChannel, chan2: discord.VoiceChannel,
                           fromvc: discord.VoiceChannel=None):
+        """Can be used to split a group of people into 2 random teams.
+        \nSyntax: randomteams VChannel1 VChannel2 HomeChannel"""
         if fromvc is None:
             if ctx.author.voice is None:
                 return None

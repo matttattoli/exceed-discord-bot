@@ -89,7 +89,7 @@ class PublicCmds:
         t1 = time.perf_counter()
         await ctx.trigger_typing()
         t2 = time.perf_counter()
-        await ctx.send("Pong.\nTime: " + str(round((t2 - t1) * 1000)) + "ms")
+        await ctx.send("Pong. :ping_pong:\nTime: " + str(round((t2 - t1) * 1000)) + "ms")
 
     @commands.command()
     async def randomcolor(self, ctx):
@@ -98,7 +98,7 @@ class PublicCmds:
         embed = discord.Embed(color=randycolor, description="Color: " + str(randycolor))
         await ctx.send(embed=embed)
 
-    @commands.command(hidden=True)
+    @commands.command()
     async def userinfo(self, ctx, mem: discord.Member = None):
         """Gives userinfo of yourself, or another user."""
         if mem is None:
@@ -122,6 +122,17 @@ class PublicCmds:
                                                                                                  str(userrolelist)),
                               width=100)
         embed.set_image(url=mem.avatar_url_as(static_format='png', size=64))
+        await ctx.send(embed=embed)
+
+    @commands.command()
+    async def avatar(self, ctx, mem: discord.Member = None):
+        """Gives avatar of yourself, or another user."""
+        if mem is None:
+            mem = ctx.message.author
+        await ctx.trigger_typing()
+        embed = discord.Embed(title="Showing avatar for: " + mem.display_name + "#" + str(mem.discriminator) + " : "
+                                    + str(mem.id))
+        embed.set_image(url=mem.avatar_url_as(static_format='png', size=1024))
         await ctx.send(embed=embed)
 
     @commands.command()

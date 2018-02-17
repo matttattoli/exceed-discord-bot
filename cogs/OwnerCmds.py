@@ -20,12 +20,12 @@ class OwnerCmds:
         self.bot = bot
         self._last_result = None
 
-    @commands.command(hidden=True)
+    @commands.command()
     @commands.check(is_owner)
     async def exec(self, ctx, code: str):
         exec(code)
 
-    @commands.command(hidden=True)
+    @commands.command()
     @commands.check(is_owner)
     async def roles(self, ctx):
         listofroles = []
@@ -34,12 +34,12 @@ class OwnerCmds:
         embed = discord.Embed(title="List of Guild Roles", description=str(listofroles))
         await ctx.send(embed=embed)
 
-    @commands.command(hidden=True)
+    @commands.command()
     @commands.check(is_owner)
     async def setgame(self, ctx, *, setgameto: str = ''):
         await self.bot.change_presence(game=discord.Game(name=setgameto))
 
-    @commands.command(hidden=True)
+    @commands.command()
     @commands.check(is_owner)
     async def setstatus(self, ctx, setstatusto: str = 'on'):
         if setstatusto == 'online' or setstatusto == 'on':
@@ -51,7 +51,7 @@ class OwnerCmds:
         elif setstatusto == 'dnd' or setstatusto == 'donotdisturb' or setstatusto == 'do not disturb':
             await self.bot.change_presence(status=discord.Status.dnd, game=discord.Game(name=str(ctx.me.game)))
 
-    @commands.command(hidden=True)
+    @commands.command()
     @commands.check(is_owner)
     async def killbot(self, ctx):
         await ctx.send("Bang bang :gun:")
@@ -63,7 +63,7 @@ class OwnerCmds:
         await self.bot.logout()
         # await sys.exit()
 
-    @commands.command(hidden=True)
+    @commands.command()
     @commands.check(is_owner)
     async def say(self, ctx, channel: str, *, msg: str):
         if channel == '0':
@@ -73,13 +73,13 @@ class OwnerCmds:
             await discord.utils.get(ctx.message.guild.channels, name=channel).send(msg)
             await ctx.message.delete()
 
-    @commands.command(hidden=True)
+    @commands.command()
     @commands.check(is_owner)
     async def tell(self, ctx, user: discord.Member, *, msg: str):
         await user.send(msg)
         await ctx.message.delete()
 
-    @commands.command(hidden=True)
+    @commands.command()
     @commands.check(is_owner)
     async def joinvc(self, ctx, channel: str = None):
         if ctx.me.voice is None:
@@ -93,30 +93,29 @@ class OwnerCmds:
             else:
                 await ctx.me.move_to(discord.utils.get(ctx.message.guild.voice_channels, name=channel))
 
-    @commands.command(hidden=True)
+    @commands.command()
     @commands.is_owner()
     async def disconnect(self, ctx):
         if ctx.me.voice is not None:
             await ctx.voice_client.disconnect()
 
-    @commands.command(hidden=True)
+    @commands.command()
     @commands.check(is_admin)
     async def mention(self, ctx, mem: discord.Member, num: int=1, msg: str=''):
         for i in range(num):
             await ctx.send(mem.mention + " " + msg)
 
-    @commands.command(hidden=True)
+    @commands.command()
     @commands.is_owner()
     async def playa(self, ctx, src: str=None):
         await ctx.voice_client.play(src)
 
-    @commands.command(hidden=True)
+    @commands.command()
     @commands.is_owner()
     async def stopa(self, ctx):
         await ctx.me.stop()
 
-    # TODO: maybe something to move people around voice channels
-    @commands.command(hidden=True)
+    @commands.command()
     @commands.is_owner()
     async def fmove(self, ctx, user: discord.Member, room: discord.VoiceChannel, amount: int=1):
         for i in range(amount):
@@ -131,7 +130,7 @@ class OwnerCmds:
         # remove `foo`
         return content.strip('` \n')
 
-    @commands.command(pass_context=True, hidden=True, name='eval')
+    @commands.command(name='eval')
     @commands.is_owner()
     async def _eval(self, ctx, *, body: str):
         """Evaluates a code"""
@@ -178,6 +177,24 @@ class OwnerCmds:
             else:
                 self._last_result = ret
                 await ctx.send(f'```py\n{value}{ret}\n```')
+				
+"""
+    @commands.command()
+    @commands.is_owner()
+    async def ghostafk(self, ctx, user: discord.Member, chance: int = 20):
+        if str(user) in getGuildSetting(ctx.guild.id, "ghostafk"):
+            removeGuildSetting(ctx.guild.id, "ghostafk", str(user))
+        else:
+            appendGuildSetting(ctx.guild.id, "ghostafk", str(user))
+        while str(user) in getGuildSetting(ctx.guild.id, "ghostafk"):
+            await asyncio.sleep(5)
+            try:
+                if random.randint(0, chance) == 1:
+                    await user.move_to(ctx.guild.get_channel(356992803131359232))
+                    print("ghost moved " + str(user))
+            except:
+                print("error moving " + str(user))
+"""
 
 
 def setup(bot):
