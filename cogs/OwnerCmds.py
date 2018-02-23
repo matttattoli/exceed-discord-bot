@@ -80,40 +80,10 @@ class OwnerCmds:
         await ctx.message.delete()
 
     @commands.command()
-    @commands.check(is_owner)
-    async def joinvc(self, ctx, channel: str = None):
-        if ctx.me.voice is None:
-            if channel is None:
-                await ctx.author.voice.channel.connect()
-            else:
-                await discord.utils.get(ctx.message.guild.voice_channels, name=channel).connect()
-        else:
-            if channel is None:
-                await ctx.me.move_to(ctx.author.voice.channel)
-            else:
-                await ctx.me.move_to(discord.utils.get(ctx.message.guild.voice_channels, name=channel))
-
-    @commands.command()
-    @commands.is_owner()
-    async def disconnect(self, ctx):
-        if ctx.me.voice is not None:
-            await ctx.voice_client.disconnect()
-
-    @commands.command()
     @commands.check(is_admin)
     async def mention(self, ctx, mem: discord.Member, num: int=1, msg: str=''):
         for i in range(num):
             await ctx.send(mem.mention + " " + msg)
-
-    @commands.command()
-    @commands.is_owner()
-    async def playa(self, ctx, src: str=None):
-        await ctx.voice_client.play(src)
-
-    @commands.command()
-    @commands.is_owner()
-    async def stopa(self, ctx):
-        await ctx.me.stop()
 
     @commands.command()
     @commands.is_owner()
@@ -177,7 +147,8 @@ class OwnerCmds:
             else:
                 self._last_result = ret
                 await ctx.send(f'```py\n{value}{ret}\n```')
-				
+
+
 """
     @commands.command()
     @commands.is_owner()

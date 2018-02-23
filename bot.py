@@ -14,8 +14,8 @@ from cogs.utils.GlobalVars import *
 from cogs.utils.debug import *
 from cogs.utils.GuildSpecific import *
 description = "Pro bot to EXCEED your imagination"
-bot = Bot(description=description, command_prefix=config["prefix"], pm_help=True)
-startup_extensions = ("cogs.PublicCmds", "cogs.AdminCmds", "cogs.OwnerCmds", "cogs.TestCmds")
+bot = Bot(description=description, command_prefix=commands.when_mentioned_or(config["prefix"]), pm_help=True)
+startup_extensions = ("cogs.PublicCmds", "cogs.AdminCmds", "cogs.OwnerCmds", "cogs.TestCmds", "cogs.voice")
 
 
 @bot.event
@@ -36,6 +36,7 @@ async def on_ready():
 async def load(ctx, extension_name: str):
     try:
         bot.load_extension(extension_name)
+        await ctx.message.add_reaction('\N{OK HAND SIGN}')
     except (AttributeError, ImportError) as e:
         print("{}: {}".format(type(e).__name__, str(e)))
         return
