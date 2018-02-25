@@ -103,7 +103,7 @@ class Music:
         await ctx.send('Now playing: {}'.format(player.title))
 
     @commands.command()
-    async def volume(self, ctx, volume: int):
+    async def volume(self, ctx, volume: float):
         """Changes the player's volume"""
 
         if ctx.voice_client is None:
