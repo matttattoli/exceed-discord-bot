@@ -15,7 +15,8 @@ from cogs.utils.debug import *
 from cogs.utils.GuildSpecific import *
 description = "Pro bot to EXCEED your imagination"
 bot = Bot(description=description, command_prefix=commands.when_mentioned_or(config["prefix"]), pm_help=True)
-startup_extensions = ("cogs.PublicCmds", "cogs.AdminCmds", "cogs.OwnerCmds", "cogs.TestCmds", "cogs.Music")
+startup_extensions = ("cogs.PublicCmds", "cogs.AdminCmds", "cogs.OwnerCmds", "cogs.TestCmds", "cogs.Music",
+                      "cogs.Stats")
 
 
 @bot.event
@@ -50,7 +51,7 @@ async def _reload(ctx, module: str):
     try:
         bot.unload_extension(module)
         bot.load_extension(module)
-        debug_print(str(module))
+        debug_print(str(module) + ' reloaded.')
     except Exception as e:
         await ctx.send(f'```py\n{traceback.format_exc()}\n```')
     else:

@@ -111,16 +111,11 @@ class PublicCmds:
             else:
                 userrolelist.append(role.name)
         embed = discord.Embed(title="Showing user info for: " + mem.display_name + "#" + str(mem.discriminator) + " : "
-                                    + str(mem.id), description="User Status: {}\nPlaying: {}\nUser Avatar: {}\nUser Jo"
-                                                               "ined: {}\nUser Roles: {}".format(str(mem.status),
-                                                                                                 str(mem.game),
-                                                                                                 str(mem.avatar_url_as(
-                                                                                                     static_format='png'
-                                                                                                     ,
-                                                                                                     size=1024)),
-                                                                                                 str(mem.joined_at),
-                                                                                                 str(userrolelist)),
-                              width=100)
+                                    + str(mem.id), description="User Status: {}\nPlaying: {}\nUser Avatar: {}\nUser "
+                                                               "Joined: {}\nUser Roles: {}"
+                              .format(str(mem.status), str(mem.game),
+                                      str(mem.avatar_url_as(static_format='png', size=1024)), str(mem.joined_at),
+                                      str(userrolelist)), width=100)
         embed.set_image(url=mem.avatar_url_as(static_format='png', size=64))
         await ctx.send(embed=embed)
 
