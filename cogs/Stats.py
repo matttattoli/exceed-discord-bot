@@ -19,29 +19,41 @@ class Stats:
     async def r6stats(self, ctx, player: str=None, platform: str='uplay'):
         if player is None:
             return await ctx.send("Error: Need a proper username")
-        stats = json.loads(urlopen(Request('https://api.r6stats.com/api/v1/players/{}?platform={}'
-                                           .format(player, platform), headers={'User-Agent': 'Mozilla/5.0'})).read()
-                           .decode("utf-8"))
+        try:
+            stats = json.loads(urlopen(Request('https://api.r6stats.com/api/v1/players/{}?platform={}'
+                                               .format(player, platform), headers={'User-Agent': 'Mozilla/5.0'})).read()
+                               .decode("utf-8"))
+        except:
+            return await ctx.send("Error: Need a valid username")
         if 'status' in stats:
             return await ctx.send(stats['errors'][0]['detail'])
-        embed = discord.Embed(title="Stats for {} who also happens to be level {}"
-                              .format(stats['player']["username"], stats['player']['stats']['progression']['level']))
-        embed.add_field(name="Ranked Stats", value="------------------------", inline=False)
+        embed1 = discord.Embed(title="Stats for {} who also happens to be level {}"
+                               .format(stats['player']["username"], stats['player']['stats']['progression']['level']))
+        embed2 = discord.Embed(title="Overall Stats for {}".format(stats['player']['username']))
+        embed1.add_field(name="Ranked Stats", value="------------------------", inline=False)
         for x in stats['player']['stats']['ranked']:
-            if type(stats['player']['stats']['ranked'][x]) is not bool:
-                embed.add_field(name=jsontoenglish[x], value=stats['player']['stats']['ranked'][x])
+            if jsontoenglish[x] == "Playtime":
+                embed1.add_field(name=jsontoenglish[x],
+                                 value='{0:.2f} hours'.format(float(stats['player']['stats']['ranked'][x])/3600))
+            elif type(stats['player']['stats']['ranked'][x]) is not bool:
+                embed1.add_field(name=jsontoenglish[x], value=stats['player']['stats']['ranked'][x])
             else:
-                embed.add_field(name=jsontoenglish[x], value=jsontoenglish[stats['player']['stats']['ranked'][x]])
-        embed.add_field(name="Casual Stats", value="------------------------", inline=False)
+                embed1.add_field(name=jsontoenglish[x], value=jsontoenglish[stats['player']['stats']['ranked'][x]])
+                break
+        embed1.add_field(name="Casual Stats", value="------------------------", inline=False)
         for x in stats['player']['stats']['casual']:
-            if type(stats['player']['stats']['casual'][x]) is not bool:
-                embed.add_field(name=jsontoenglish[x], value=stats['player']['stats']['casual'][x])
+            if jsontoenglish[x] == "Playtime":
+                embed1.add_field(name=jsontoenglish[x],
+                                 value='{0:.2f} hours'.format(float(stats['player']['stats']['casual'][x])/3600))
+            elif type(stats['player']['stats']['casual'][x]) is not bool:
+                embed1.add_field(name=jsontoenglish[x], value=stats['player']['stats']['casual'][x])
             else:
-                embed.add_field(name=jsontoenglish[x], value=jsontoenglish[stats['player']['stats']['casual'][x]])
-        embed.add_field(name="Overall Stats", value="------------------------", inline=False)
+                embed1.add_field(name=jsontoenglish[x], value=jsontoenglish[stats['player']['stats']['casual'][x]])
+        # embed1.add_field(name="Overall Stats", value="------------------------", inline=False)
         for x in stats['player']['stats']['overall']:
-            embed.add_field(name=jsontoenglish[x], value=stats['player']['stats']['overall'][x])
-        await ctx.send(embed=embed)
+            embed2.add_field(name=jsontoenglish[x], value=stats['player']['stats']['overall'][x])
+        await ctx.send(embed=embed1)
+        await ctx.send(embed=embed2)
 
 
 def setup(bot):

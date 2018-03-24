@@ -6,8 +6,7 @@ import sys
 from cogs.utils.checks import *
 from cogs.utils.GlobalVars import *
 from cogs.utils.debug import *
-from cogs.utils.GuildSpecific import *
-
+from cogs.utils.Database import Database
 
 class AdminCmds:
     def __init__(self, bot):
@@ -68,12 +67,13 @@ class AdminCmds:
 
     @commands.command()
     @commands.check(is_admin)
-    async def setlogchannel(self, ctx):
-        setGuildLogChannel(ctx.guild.id, ctx.channel.id)
-        if getGuildLogChannel(ctx.guild.id) == ctx.channel.id:
-            await ctx.message.add_reaction(emoji=checkmarkemoji)
-        else:
-            await ctx.message.add_reaction(emoji=xredemoji)
+    async def setlogchannel(self, ctx, log_mode: int = 1):
+        # setGuildLogChannel(ctx.guild.id, ctx.channel.id)
+        # if getGuildLogChannel(ctx.guild.id) == ctx.channel.id:
+        #     await ctx.message.add_reaction(emoji=checkmarkemoji)
+        # else:
+        #     await ctx.message.add_reaction(emoji=xredemoji)
+        Database.setLogChannel(ctx.guild.id, log_mode, ctx.channel.id)
 
     @commands.command()
     @commands.check(is_admin)

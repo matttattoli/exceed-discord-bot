@@ -1,3 +1,5 @@
+# File retired, replaced with cogs.utils.Database which uses sqlite3 instead of a text file for json data.
+
 from os import path
 import json
 eee = path.dirname(__file__).split('/')[:-2]

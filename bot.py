@@ -12,7 +12,7 @@ import traceback
 from cogs.utils.checks import *
 from cogs.utils.GlobalVars import *
 from cogs.utils.debug import *
-from cogs.utils.GuildSpecific import *
+from cogs.utils.Database import Database
 description = "Pro bot to EXCEED your imagination"
 bot = Bot(description=description, command_prefix=commands.when_mentioned_or(config["prefix"]), pm_help=True)
 startup_extensions = ("cogs.PublicCmds", "cogs.AdminCmds", "cogs.OwnerCmds", "cogs.TestCmds", "cogs.Music",
@@ -103,45 +103,45 @@ async def unload(ctx, extension_name: str):
 @bot.listen()
 @commands.check(has_log_enabled)
 async def on_member_join(member):
-    await bot.get_channel(getGuildLogChannel(member.guild.id)).send(str(member) + " has joined the server.")
+    await bot.get_channel(Database.getLogChannel(member.guild.id)).send(str(member) + " has joined the server.")
     await member.add_roles(discord.utils.get(member.guild.roles, name="Member"))
 
 
 @bot.listen()
 @commands.check(has_log_enabled)
 async def on_member_remove(member):
-    await bot.get_channel(getGuildLogChannel(member.guild.id)).send(str(member) + " has left the server.")
+    await bot.get_channel(Database.getLogChannel(member.guild.id)).send(str(member) + " has left the server.")
 
 
 @bot.listen()
 async def on_guild_join(guild):
-    addNewGuild(guild.id)
+    Database.initializeGuild(guild.id)
 
 
 @bot.listen()
 @commands.check(has_log_enabled)
 async def on_guild_channel_create(channel):
-    await bot.get_channel(getGuildLogChannel(channel.guild.id)).send(
+    await bot.get_channel(Database.getLogChannel(channel.guild.id)).send(
         "{} {} has been created.".format(str(type(channel)).split('.')[2][:-2], channel.name))
 
 
 @bot.listen()
 @commands.check(has_log_enabled)
 async def on_guild_channel_delete(channel):
-    await bot.get_channel(getGuildLogChannel(channel.guild.id)).send(
+    await bot.get_channel(Database.getLogChannel(channel.guild.id)).send(
         "{} {} has been deleted.".format(str(type(channel)).split('.')[2][:-2], channel.name))
 
 
 @bot.listen()
 @commands.check(has_log_enabled)
 async def on_guild_role_create(role):
-    await bot.get_channel(getGuildLogChannel(role.guild.id)).send("Role {} has been created.".format(role.name))
+    await bot.get_channel(Database.getLogChannel(role.guild.id)).send("Role {} has been created.".format(role.name))
 
 
 @bot.listen()
 @commands.check(has_log_enabled)
 async def on_guild_role_delete(role):
-    await bot.get_channel(getGuildLogChannel(role.guild.id)).send("Role {} has been deleted.".format(role.name))
+    await bot.get_channel(Database.getLogChannel(role.guild.id)).send("Role {} has been deleted.".format(role.name))
 
 
 @bot.listen()
@@ -163,20 +163,21 @@ async def on_member_update(before, after):
             descr = "Role " + changedrole
     if not descr == '':
         embed = discord.Embed(title="User {} : {} has been updated.".format(str(before), before.id), description=descr)
-        await bot.get_channel(getGuildLogChannel(before.guild.id)).send(embed=embed)
+        await bot.get_channel(Database.getLogChannel(before.guild.id)).send(embed=embed)
 
 
 @bot.listen()
 @commands.check(has_log_enabled)
 async def on_member_ban(guild, user):
-    await bot.get_channel(getGuildLogChannel(guild.id)).send('User {} : {} has been banned.'.format(str(user), user.id))
+    await bot.get_channel(Database.getLogChannel(guild.guild.id)).send('User {} : {} has been banned.'
+                                                                       .format(str(user), user.id))
 
 
 @bot.listen()
 @commands.check(has_log_enabled)
 async def on_member_unban(guild, user):
-    await bot.get_channel(getGuildLogChannel(guild.id)).send('User {} : {} has been unbanned.'.format(str(user),
-                                                                                                      user.id))
+    await bot.get_channel(Database.getLogChannel(guild.guild.id)).send('User {} : {} has been unbanned.'
+                                                                       .format(str(user), user.id))
 
 if __name__ == "__main__":
     for extension in startup_extensions:

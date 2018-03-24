@@ -12,22 +12,20 @@ class PublicCmds:
     def __init__(self, bot):
         self.bot = bot
 
-    @commands.command()
-    async def shelp(self, ctx):
-        await ctx.send("```This is just a test\nwondering if this will work\nand if this is 3 lines```")
-
     @commands.command(aliases=["flip", "coin", "cointoss"])
     async def flipcoin(self, ctx):
         """Flips a coin."""
         if randint(0, 1) == 0:
-            await ctx.send("Tails")
+            return await ctx.send("Tails")
         else:
-            await ctx.send("Heads")
+            return await ctx.send("Heads")
 
     @commands.command()
     async def pick(self, ctx, *pick: str):
         """Randomly picks from a list of arguments given. Ex. pick 1 2 3."""
-        await ctx.send(pick[randint(0, int(pick.__len__() - 1))])
+        if len(pick) == 0:
+            return await ctx.send("Oops, you forgot some choices to pick from!")
+        return await ctx.send(pick[randint(0, int(len(pick) - 1))])
 
     @commands.command(aliases=["addrole"])
     async def getrole(self, ctx, *, addrole: str):
@@ -76,12 +74,12 @@ class PublicCmds:
     @commands.command()
     async def roll(self, ctx, maximumroll: int = 6):
         """Roles a standard 6 sided dice (or up to given number)."""
-        await ctx.send(ctx.message.author.name + " rolled a " + str(randint(1, maximumroll)))
+        return await ctx.send(ctx.message.author.name + " rolled a " + str(randint(1, maximumroll)))
 
     @commands.command()
     async def membercount(self, ctx):
         """The amount of users connected to this server."""
-        await ctx.send("This server has {} users connected.".format(ctx.message.guild.member_count))
+        return await ctx.send("This server has {} users connected.".format(ctx.message.guild.member_count))
 
     @commands.command()
     async def ping(self, ctx):
@@ -96,7 +94,7 @@ class PublicCmds:
         """Picks a random hex color and gives a preview."""
         randycolor = discord.Color(randint(0x000000, 0xFFFFFF))
         embed = discord.Embed(color=randycolor, description="Color: " + str(randycolor))
-        await ctx.send(embed=embed)
+        return await ctx.send(embed=embed)
 
     @commands.command()
     async def userinfo(self, ctx, mem: discord.Member = None):
@@ -117,7 +115,7 @@ class PublicCmds:
                                       str(mem.avatar_url_as(static_format='png', size=1024)), str(mem.joined_at),
                                       str(userrolelist)), width=100)
         embed.set_image(url=mem.avatar_url_as(static_format='png', size=64))
-        await ctx.send(embed=embed)
+        return await ctx.send(embed=embed)
 
     @commands.command()
     async def avatar(self, ctx, mem: discord.Member = None):
@@ -128,7 +126,7 @@ class PublicCmds:
         embed = discord.Embed(title="Showing avatar for: " + mem.display_name + "#" + str(mem.discriminator) + " : "
                                     + str(mem.id))
         embed.set_image(url=mem.avatar_url_as(static_format='png', size=1024))
-        await ctx.send(embed=embed)
+        return await ctx.send(embed=embed)
 
     @commands.command()
     async def checkmc(self, ctx):
