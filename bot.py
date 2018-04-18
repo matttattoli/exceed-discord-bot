@@ -169,15 +169,15 @@ async def on_member_update(before, after):
 @bot.listen()
 @commands.check(has_log_enabled)
 async def on_member_ban(guild, user):
-    await bot.get_channel(Database.getLogChannel(guild.guild.id)).send('User {} : {} has been banned.'
-                                                                       .format(str(user), user.id))
+    await bot.get_channel(Database.getLogChannel(guild.id)).send('User {} : {} has been banned.'
+                                                                 .format(str(user), user.id))
 
 
 @bot.listen()
 @commands.check(has_log_enabled)
 async def on_member_unban(guild, user):
-    await bot.get_channel(Database.getLogChannel(guild.guild.id)).send('User {} : {} has been unbanned.'
-                                                                       .format(str(user), user.id))
+    await bot.get_channel(Database.getLogChannel(guild.id)).send('User {} : {} has been unbanned.'
+                                                                 .format(str(user), user.id))
 
 if __name__ == "__main__":
     for extension in startup_extensions:

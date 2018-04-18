@@ -1,6 +1,7 @@
 import discord
 import sys
 import json
+import aiohttp
 import urllib.request
 from discord.ext import commands
 from random import *
