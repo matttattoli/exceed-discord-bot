@@ -1,4 +1,4 @@
-xredemoji = '\N{CROSS MARK}'
+redxemoji = '\N{CROSS MARK}'
 checkmarkemoji = '\N{WHITE HEAVY CHECK MARK}'
 
 """

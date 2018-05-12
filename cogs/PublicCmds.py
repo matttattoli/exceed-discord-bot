@@ -2,10 +2,12 @@ import discord
 import sys
 import json
 import aiohttp
+import async_timeout
 import urllib.request
 from discord.ext import commands
 from random import *
 from cogs.utils.GlobalVars import *
+from cogs.utils.Database import Database
 import time
 
 
@@ -28,53 +30,9 @@ class PublicCmds:
             return await ctx.send("Oops, you forgot some choices to pick from!")
         return await ctx.send(pick[randint(0, int(len(pick) - 1))])
 
-    @commands.command(aliases=["addrole"])
-    async def getrole(self, ctx, *, addrole: str):
-        """Gives you a game role."""
-        alreadyhaveroles = []
-        validrole = False
-        toprole = 0
-        for role in ctx.message.guild.roles:
-            if role.name == "overwatch":
-                toprole = role.position
-        for role in ctx.message.guild.roles:
-            if role.name == addrole and role.position <= toprole and role.position >= 1:
-                validrole = True
-        for role1 in ctx.message.author.roles:
-            alreadyhaveroles.append(str(role1))
-        if addrole in alreadyhaveroles:
-            await ctx.message.add_reaction(emoji=xredemoji)
-        else:
-            if validrole:
-                await ctx.message.author.add_roles(discord.utils.get(ctx.message.guild.roles, name=addrole))
-                await ctx.message.add_reaction(emoji=checkmarkemoji)
-            else:
-                await ctx.message.add_reaction(emoji=xredemoji)
-
-    @commands.command(aliases=["rmvrole"])
-    async def removerole(self, ctx, *, rmvrole: str):
-        """Removes a game role."""
-        alreadyhaveroles = []
-        validrole = False
-        toprole = 0
-        for role in ctx.message.guild.roles:
-            if role.name == "overwatch":
-                toprole = role.position
-        for role in ctx.message.guild.roles:
-            if role.name == rmvrole and role.position <= toprole and role.position >= 1:
-                validrole = True
-        for role1 in ctx.message.author.roles:
-            alreadyhaveroles.append(str(role1))
-        if rmvrole in alreadyhaveroles:
-            if validrole:
-                await ctx.message.author.remove_roles(discord.utils.get(ctx.message.guild.roles, name=rmvrole))
-                await ctx.message.add_reaction(emoji=checkmarkemoji)
-            else:
-                await ctx.message.add_reaction(emoji=xredemoji)
-
     @commands.command()
     async def roll(self, ctx, maximumroll: int = 6):
-        """Roles a standard 6 sided dice (or up to given number)."""
+        """Rolls a standard 6 sided dice (or up to given number)."""
         return await ctx.send(ctx.message.author.name + " rolled a " + str(randint(1, maximumroll)))
 
     @commands.command()

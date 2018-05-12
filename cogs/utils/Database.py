@@ -54,3 +54,28 @@ class Database:
         else:
             return data[1]
 
+    def addfunrole(gid: int, role: discord.Role):
+        cursor.execute("SELECT gid FROM funroles WHERE roleid = ?", (role.id,))
+        data = cursor.fetchone()
+        if data is None:
+            cursor.execute("""INSERT INTO funroles(gid, rolename, roleid) VALUES(?,?,?)""", (gid, role.name, role.id))
+        else:
+            return
+        db.commit()
+
+    def removefunrole(gid: int, role: discord.Role):
+        cursor.execute("DELETE FROM funroles WHERE roleid = ?", (role.id,))
+        db.commit()
+
+    def getfunrole(gid: int, roleid: int):
+        cursor.execute("SELECT roleid, rolename FROM funroles WHERE roleid = ?", (roleid,))
+        data = cursor.fetchone()
+        if data is not None:
+            return True
+        else:
+            return False
+
+    def getFunRoles(gid: int):
+        cursor.execute("SELECT rolename FROM funroles WHERE gid = ?", (gid,))
+        data = cursor.fetchall()
+        return data

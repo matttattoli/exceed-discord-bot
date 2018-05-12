@@ -28,42 +28,38 @@ class AdminCmds:
                 # debug_print("Added Member role to " + member.name)
         await ctx.send(str(notverified) + " do not have the Member role")
 
-    @commands.command()
+    @commands.group(invoke_without_command=True)
     @commands.check(is_admin)
     async def purge(self, ctx, number: int):
-        await ctx.message.channel.purge(limit=number + 1)
-        await ctx.send('Deleted {} message(s)'.format(number), delete_after=2.5)
+        await ctx.message.channel.purge(limit=number + 1)  # +1 to compensate for the users purge message.
+        await ctx.send('Deleted {} message(s)'.format(number), delete_after=3)
 
-    @commands.command(aliases=["newrole"])
+    @purge.command()
     @commands.check(is_admin)
-    async def createrole(self, ctx, *, rolename: str):
-        currentroles = []
-        for role in ctx.message.guild.roles:
-            currentroles.append(role.name.lower())
-        if rolename.lower() not in currentroles:
-            await ctx.message.guild.create_role(name=rolename, mentionable=True, hoist=False, reason="New Game Role")
-            await ctx.message.add_reaction(emoji=checkmarkemoji)
-        else:
-            await ctx.message.add_reaction(emoji=xredemoji)
+    async def user(self, ctx, mem: discord.Member, number: int):
+        def is_user(m):
+            return m.author == mem
+        await ctx.message.channel.purge(limit=number, check=is_user)
+        await ctx.send('Deleted {} message(s) from {}'.format(number, str(mem)), delete_after=3)
 
-    @commands.command()
-    @commands.check(is_admin)
-    async def deleterole(self, ctx, *, rolename: str):
-        currentroles = []
-        toprole = 0
-        validrole = False
-        for role in ctx.message.guild.roles:
-            currentroles.append(role.name.lower())
-            if role.name == 'overwatch':
-                toprole = role.position
-        for role in ctx.message.guild.roles:
-            if role.name == rolename and role.position <= toprole:
-                validrole = True
-        if rolename.lower() in currentroles and validrole:
-            await discord.utils.get(ctx.message.guild.roles, name=rolename).delete()
-            await ctx.message.add_reaction(emoji=checkmarkemoji)
-        else:
-            await ctx.message.add_reaction(emoji=xredemoji)
+    # @commands.command()
+    # @commands.check(is_admin)
+    # async def deleterole(self, ctx, *, rolename: str):
+    #     currentroles = []
+    #     toprole = 0
+    #     validrole = False
+    #     for role in ctx.message.guild.roles:
+    #         currentroles.append(role.name.lower())
+    #         if role.name == 'overwatch':
+    #             toprole = role.position
+    #     for role in ctx.message.guild.roles:
+    #         if role.name == rolename and role.position <= toprole:
+    #             validrole = True
+    #     if rolename.lower() in currentroles and validrole:
+    #         await discord.utils.get(ctx.message.guild.roles, name=rolename).delete()
+    #         await ctx.message.add_reaction(emoji=checkmarkemoji)
+    #     else:
+    #         await ctx.message.add_reaction(emoji=xredemoji)
 
     @commands.command()
     @commands.check(is_admin)

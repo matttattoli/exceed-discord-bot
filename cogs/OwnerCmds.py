@@ -27,7 +27,7 @@ class OwnerCmds:
 
     @commands.command()
     @commands.check(is_owner)
-    async def roles(self, ctx):
+    async def printroles(self, ctx):
         listofroles = []
         for role in ctx.message.guild.roles:
             listofroles.append(role.name + ":" + str(role.id))
