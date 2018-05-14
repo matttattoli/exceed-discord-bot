@@ -10,13 +10,13 @@ class FunRoles:
     def __init__(self, bot):
         self.bot = bot
 
-    @commands.group(invoke_without_command=True)
+    @commands.group(invoke_without_command=True, aliases=["roles", "funroles"])
     async def role(self, ctx):
-        return await ctx.send(Database.getFunRoles(ctx.guild.id))
+        pass
 
-    # @role.command()
-    # async def list(self, ctx):
-    #     return ctx.send(Database.getFunRoles(ctx.guild.id))
+    @role.command()
+    async def list(self, ctx):
+        return await ctx.send(Database.getFunRoles(ctx.guild.id))
 
     @role.command()
     @commands.check(is_admin)

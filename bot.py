@@ -97,6 +97,7 @@ async def ownerhelp(ctx):
 @commands.is_owner()
 async def unload(ctx, extension_name: str):
         bot.unload_extension(extension_name)
+        await ctx.message.add_reaction('\N{OK HAND SIGN}')
         print("{} unloaded.".format(extension_name))
 
 
