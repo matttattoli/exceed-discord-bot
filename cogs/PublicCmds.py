@@ -3,7 +3,6 @@ import sys
 import json
 import aiohttp
 import async_timeout
-import urllib.request
 from discord.ext import commands
 from random import *
 from cogs.utils.GlobalVars import *
@@ -89,8 +88,10 @@ class PublicCmds:
 
     @commands.command()
     async def checkmc(self, ctx):
-        data = urllib.request.urlopen("https://api.mcsrvstat.us/1/gamfrk.noip.me:7777")
-        data = json.load(data)
+        async with aiohttp.ClientSession() as cs:
+            with async_timeout.timeout(10):
+                async with cs.get("https://api.mcsrvstat.us/1/gamfrk.noip.me:7777") as r:
+                    data = await r.json()
         if "offline" in data:
             await ctx.send("Server offline")
         else:

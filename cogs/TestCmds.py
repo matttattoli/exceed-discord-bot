@@ -6,6 +6,8 @@ from cogs.utils.GlobalVars import *
 from cogs.utils.checks import *
 from cogs.utils.debug import *
 import asyncio
+import aiohttp
+import async_timeout
 
 
 class TestCmds:
@@ -14,56 +16,26 @@ class TestCmds:
 
     @commands.command(hidden=True)
     @commands.check(is_owner)
-    async def test1(self, ctx):
-        await ctx.send(ctx.message.guild.me.status + " : " + ctx.message.guild.me.game)
-
-    @commands.command(hidden=True)
-    @commands.check(is_owner)
     async def test2(self, ctx):
         await ctx.send(str(self.bot.emojis))
 
-
-"""
-    @commands.command(hidden=True)
-    @commands.check(is_admin)
-    async def wank(self, ctx, ww: str):
-        times = 1
-        if ww == 'slow':
-            times = 0.3
-        elif ww == 'fast':
-            times = 0.1
-        msg = await ctx.send('8=mm===D')
-        for i in range(100):
-            await msg.edit(content='8=mm===D')
-            await asyncio.sleep(times)
-            await msg.edit(content='8==mm==D')
-            await asyncio.sleep(times)
-            await msg.edit(content='8===mm=D')
-            await asyncio.sleep(times)
-            await msg.edit(content='8==mm==D')
-            await asyncio.sleep(times)
-"""
-
-
-"""
-    @commands.command(hidden=True)
-    @commands.check(is_owner)
-    async def test6(self, ctx):
-        data = {"1st": ["this is a test", '1', 2, 4], '2nd': 'idk what im doin'}
-        json.dump(data, open('test6.json', 'w'), indent=4, sort_keys=True)
-        data2 = {"name": 'alpha', 'num': [1, 2, 3, 4, 5, 6]}
-        data3 = [1, 2, 3, 4, 5, 6]
-        json.dump(data2, indent=4, sort_keys=True, fp=open('test6.json', 'w'))
-        # json.dump(data3, open('test6.json', 'w+'), indent=4, sort_keys=True)
-
-
-
-    @commands.command(hidden=True)
-    @commands.check(is_owner)
-    async def occupiedvchannels(self, ctx, status: bool):
-        NewOccupiedChannelsEnabled = status
-        await ctx.send(NewOccupiedChannelsEnabled)
-"""
+    @commands.command()
+    async def testcheckmc(self, ctx):
+        async with aiohttp.ClientSession() as cs:
+            with async_timeout.timeout(10):
+                async with cs.get("https://api.mcsrvstat.us/1/gamfrk.noip.me:7777") as r:
+                    data = await r.json()
+        if "offline" in data:
+            await ctx.send("Server offline")
+        else:
+            embed = discord.Embed(title="Showing server info for Minecraft")
+            embed.add_field(name="IP", value="gamfrk.noip.me:7777", inline=False)
+            if "list" in data["players"]:
+                playersval = "{} - {}".format(data["players"]["online"], data["players"]["list"])
+            else:
+                playersval = data["players"]["online"]
+            embed.add_field(name="Players", value=playersval, inline=False)
+            await ctx.send(embed=embed)
 
 
 def setup(bot):
