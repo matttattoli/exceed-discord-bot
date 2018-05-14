@@ -2,6 +2,8 @@ import asyncio
 import discord
 import json
 from urllib.request import urlopen, Request
+import aiohttp
+import async_timeout
 from discord.ext import commands
 jsontoenglish = {"wins": "Wins", "has_played": "Ever Played", "losses": "Losses", "kills": "Kills", "deaths": "Deaths",
                  "playtime": "Playtime", "kd": "Kill/Death Ratio", "wlr": "Win/Loss Ratio", "assists": "Assists",
@@ -20,9 +22,11 @@ class Stats:
         if player is None:
             return await ctx.send("Error: Need a proper username")
         try:
-            stats = json.loads(urlopen(Request('https://api.r6stats.com/api/v1/players/{}?platform={}'
-                                               .format(player, platform), headers={'User-Agent': 'Mozilla/5.0'})).read()
-                               .decode("utf-8"))
+            async with aiohttp.ClientSession() as cs:
+                with async_timeout.timeout(10):
+                    async with cs.get("https://api.r6stats.com/api/v1/players/{}?platform={}"
+                                      .format(player, platform)) as r:
+                        stats = await r.json()
         except:
             return await ctx.send("Error: Need a valid username")
         if 'status' in stats:
