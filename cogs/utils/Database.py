@@ -67,7 +67,7 @@ class Database:
         cursor.execute("DELETE FROM funroles WHERE roleid = ?", (role.id,))
         db.commit()
 
-    def getfunrole(gid: int, roleid: int):
+    def isfunrole(self, gid: int, roleid: int):
         cursor.execute("SELECT roleid, rolename FROM funroles WHERE roleid = ?", (roleid,))
         data = cursor.fetchone()
         if data is not None:

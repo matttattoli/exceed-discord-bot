@@ -23,7 +23,7 @@ class FunRoles:
     async def create(self, ctx, *, rolename: str):
         roleobj = discord.utils.get(ctx.guild.roles, name=rolename)
         Database.addfunrole(ctx.guild.id, roleobj)
-        if Database.getfunrole(ctx.guild.id, roleobj.id):
+        if Database.isfunrole(ctx.guild.id, roleobj.id):
             return await ctx.message.add_reaction(emoji=checkmarkemoji)
         else:
             return await ctx.message.add_reaction(emoji=redxemoji)
@@ -35,7 +35,7 @@ class FunRoles:
         rolesnotadded = []
         for role in rolename:
             Database.addfunrole(ctx.guild.id, role)
-            if Database.getfunrole(ctx.guild.id, role.id):
+            if Database.isfunrole(ctx.guild.id, role.id):
                 rolesadded.append(role.name)
             else:
                 rolesnotadded.append(role.name)
@@ -46,9 +46,9 @@ class FunRoles:
     @commands.check(is_admin)
     async def delete(self, ctx, *, rolename: str):
         roleobj = discord.utils.get(ctx.guild.roles, name=rolename)
-        if Database.getfunrole(ctx.guild.id, roleobj.id):
+        if Database.isfunrole(ctx.guild.id, roleobj.id):
             Database.removefunrole(ctx.guild.id, roleobj)
-            if Database.getfunrole(ctx.guild.id, roleobj.id):
+            if Database.isfunrole(ctx.guild.id, roleobj.id):
                 return await ctx.message.add_reaction(emoji=redxemoji)
             else:
                 return await ctx.message.add_reaction(emoji=checkmarkemoji)
@@ -62,7 +62,7 @@ class FunRoles:
         rolesnotremoved = []
         for role in rolename:
             Database.removefunrole(ctx.guild.id, role)
-            if Database.getfunrole(ctx.guild.id, role.id):
+            if Database.isfunrole(ctx.guild.id, role.id):
                 rolesnotremoved.append(role.name)
             else:
                 rolesremoved.append(role.name)
@@ -78,7 +78,7 @@ class FunRoles:
         if roleobj in ctx.author.roles:
             await ctx.send("Oops you already have that role.")  # debug purposes
             return await ctx.message.add_reaction(emoji=redxemoji)
-        if Database.getfunrole(ctx.guild.id, roleobj.id):
+        if Database.isfunrole(ctx.guild.id, roleobj.id):
             await ctx.message.author.add_roles(roleobj)
             return await ctx.message.add_reaction(emoji=checkmarkemoji)
         else:
@@ -90,7 +90,7 @@ class FunRoles:
         if roleobj is None:
             await ctx.send("Oops that role doesn't exist.")  # debug purposes
             return await ctx.message.add_reaction(emoji=redxemoji)
-        if roleobj in ctx.author.roles and Database.getfunrole(ctx.guild.id, roleobj.id):
+        if roleobj in ctx.author.roles and Database.isfunrole(ctx.guild.id, roleobj.id):
             await ctx.message.author.remove_roles(roleobj)
             return await ctx.message.add_reaction(emoji=checkmarkemoji)
         else:
