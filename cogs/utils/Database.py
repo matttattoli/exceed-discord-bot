@@ -1,6 +1,7 @@
 import discord
 from discord.ext import commands
 import sqlite3
+import datetime
 
 
 db = sqlite3.connect("exceeddatabase.db")
@@ -12,15 +13,16 @@ cursor.execute("""CREATE TABLE IF NOT EXISTS `guilds` (
         `bot_volume`    INTEGER REAL DEFAULT 0.5,
         PRIMARY KEY(`gid`)
         )""")
-# cursor.execute("""CREATE TABLE IF NOT EXISTS `reminders` (
-#         `channelid`	INTEGER NOT NULL,
-#         `created_at`	INTEGER NOT NULL,
-#         `expires`	INTEGER NOT NULL,
-#         `message` TEXT DEFAULT NULL
-#         )""")
+cursor.execute("""CREATE TABLE IF NOT EXISTS `reminders` (
+        `userid` INTEGER NOT NULL,
+        `channelid`	INTEGER NOT NULL,
+        `created_at`	TEXT NOT NULL,
+        `expires`	TEXT NOT NULL,
+        `message` TEXT DEFAULT NULL
+        )""")
 cursor.execute("""CREATE TABLE IF NOT EXISTS `funroles` (
         `gid` INTEGER NOT NULL,
-        `rolename` TEXT NOT NULL UNIQUE,
+        `rolename` TEXT NOT NULL,
         `roleid` INTEGER NOT NULL UNIQUE,
         PRIMARY KEY(`roleid`)
         )""")
@@ -28,14 +30,17 @@ db.commit()
 
 
 class Database:
-    def initializeGuild(gid: int):
+    def __init__(self):
+        pass
+
+    def initializeGuild(self, gid: int):
         cursor.execute("SELECT gid FROM guilds WHERE gid = ?", (gid,))
         data = cursor.fetchone()
         if data is None:
             cursor.execute("INSERT INTO guilds(gid) VALUES(?)", (gid,))
         db.commit()
 
-    def setLogChannel(gid: int, logmode: int, logchan: int):
+    def setLogChannel(self, gid: int, logmode: int, logchan: int):
         cursor.execute("SELECT gid FROM guilds WHERE gid = ?", (gid,))
         data = cursor.fetchone()
         if data is None:
@@ -46,7 +51,7 @@ class Database:
                            (logmode, logchan, gid))
         db.commit()
 
-    def getLogChannel(gid: int):
+    def getLogChannel(self, gid: int):
         cursor.execute("SELECT `log_mode`, `log_channel` from guilds WHERE gid = ?", (gid,))
         data = cursor.fetchone()
         if data is None or data[0] == 0:
@@ -54,7 +59,7 @@ class Database:
         else:
             return data[1]
 
-    def addfunrole(gid: int, role: discord.Role):
+    def addfunrole(self, gid: int, role: discord.Role):
         cursor.execute("SELECT gid FROM funroles WHERE roleid = ?", (role.id,))
         data = cursor.fetchone()
         if data is None:
@@ -63,7 +68,7 @@ class Database:
             return
         db.commit()
 
-    def removefunrole(gid: int, role: discord.Role):
+    def removefunrole(self, gid: int, role: discord.Role):
         cursor.execute("DELETE FROM funroles WHERE roleid = ?", (role.id,))
         db.commit()
 
@@ -75,7 +80,7 @@ class Database:
         else:
             return False
 
-    def getFunRoles(gid: int):
+    def getFunRoles(self, gid: int):
         cursor.execute("SELECT rolename FROM funroles WHERE gid = ?", (gid,))
         data = cursor.fetchall()
         return data
