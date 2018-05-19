@@ -30,17 +30,14 @@ db.commit()
 
 
 class Database:
-    def __init__(self):
-        pass
-
-    def initializeGuild(self, gid: int):
+    def initializeGuild(gid: int):
         cursor.execute("SELECT gid FROM guilds WHERE gid = ?", (gid,))
         data = cursor.fetchone()
         if data is None:
             cursor.execute("INSERT INTO guilds(gid) VALUES(?)", (gid,))
         db.commit()
 
-    def setLogChannel(self, gid: int, logmode: int, logchan: int):
+    def setLogChannel(gid: int, logmode: int, logchan: int):
         cursor.execute("SELECT gid FROM guilds WHERE gid = ?", (gid,))
         data = cursor.fetchone()
         if data is None:
@@ -51,7 +48,7 @@ class Database:
                            (logmode, logchan, gid))
         db.commit()
 
-    def getLogChannel(self, gid: int):
+    def getLogChannel(gid: int):
         cursor.execute("SELECT `log_mode`, `log_channel` from guilds WHERE gid = ?", (gid,))
         data = cursor.fetchone()
         if data is None or data[0] == 0:
@@ -59,7 +56,7 @@ class Database:
         else:
             return data[1]
 
-    def addfunrole(self, gid: int, role: discord.Role):
+    def addfunrole(gid: int, role: discord.Role):
         cursor.execute("SELECT gid FROM funroles WHERE roleid = ?", (role.id,))
         data = cursor.fetchone()
         if data is None:
@@ -68,11 +65,11 @@ class Database:
             return
         db.commit()
 
-    def removefunrole(self, gid: int, role: discord.Role):
+    def removefunrole(gid: int, role: discord.Role):
         cursor.execute("DELETE FROM funroles WHERE roleid = ?", (role.id,))
         db.commit()
 
-    def isfunrole(self, gid: int, roleid: int):
+    def isfunrole(gid: int, roleid: int):
         cursor.execute("SELECT roleid, rolename FROM funroles WHERE roleid = ?", (roleid,))
         data = cursor.fetchone()
         if data is not None:
@@ -80,7 +77,28 @@ class Database:
         else:
             return False
 
-    def getFunRoles(self, gid: int):
+    def getFunRoles(gid: int):
         cursor.execute("SELECT rolename FROM funroles WHERE gid = ?", (gid,))
         data = cursor.fetchall()
         return data
+
+    def getReminders(userid: int):
+        cursor.execute("SELECT * FROM reminders WHERE userid = ?", (userid,))
+        data = cursor.fetchall()
+        return data
+
+    def createReminder(userid: int, channelid: int, created_at: datetime.datetime,
+                       expires: datetime.datetime, message: str=None):
+        cursor.execute("INSERT INTO reminders(userid, channelid, created_at, expires, message) VALUES(?,?,?,?,?)", (
+            userid, channelid, created_at, expires, message,))
+        db.commit()
+
+    def getExpired():
+        cursor.execute("SELECT * FROM reminders WHERE expires < ?", (datetime.datetime.now(),))
+        data = cursor.fetchall()
+        return data
+
+    def deleteReminder(userid: int, created_at: datetime.datetime, expires: datetime.datetime, message: str=None):
+        cursor.execute("DELETE FROM reminders WHERE userid = ? AND created_at = ? AND expires = ? AND message = ?",
+                       (userid, created_at, expires, message,))
+        db.commit()
