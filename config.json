@@ -3,37 +3,5 @@
 
   "owner_ids": [117441819180007431, 111964911260721152],
 
-  "active_extensions": [
-    "cogs.voice_toggle",
-    "cogs.status",
-    "cogs.joke",
-    "cogs.bible",
-    "cogs.presence",
-    "cogs.react",
-    "cogs.admin"
-  ],
-  
-  "roles": {
-  "factorio": "366993629492805643",
-  "overwatch": "382745474584805376",
-  "rainbow6": "382745566800773130",
-  "Member": "356988064138264578",
-  "Admins": "356982684662366210",
-  "@everyone": "356982589522706432",
-  "Torrent Bois": "376116127400591361",
-  "gmod": "383136876774686722"
-  },
-  
-  "getroles": [
-  "factorio",
-  "overwatch",
-  "rainbow6",
-  "gmod",
-  "Member"
-  ],
-  
-  "test": "31",
-  "debugging": "True",
-
   "description": "Pro bot to @117441819180007431 your imagination"
 }
