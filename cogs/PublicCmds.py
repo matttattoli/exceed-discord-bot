@@ -104,6 +104,18 @@ class PublicCmds:
             embed.add_field(name="Players", value=playersval, inline=False)
             await ctx.send(embed=embed)
 
+    @commands.command()
+    async def reacttext(self, ctx, react: str = None, msg: int = None):
+        if react is None:
+            return None
+        if msg is None:
+            msg = ctx.message.id
+        msg = await ctx.channel.get_message(msg)
+        for letter in react.upper():
+            await msg.add_reaction(alpha_emoji_dict[letter])
+        if not msg == ctx.message.id:
+            return await ctx.message.delete()
+
 
 def setup(bot):
     bot.add_cog(PublicCmds(bot))
