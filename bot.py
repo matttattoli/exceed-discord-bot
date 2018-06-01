@@ -1,6 +1,7 @@
 import discord
 import asyncio
 import aiohttp
+import datetime
 from discord.ext.commands import Bot
 from discord.ext import commands
 from config import *
@@ -29,7 +30,7 @@ async def on_ready():
     print('https://discordapp.com/oauth2/authorize?client_id={}&scope=bot&permissions=8'.format(bot.user.id))
     print('Current Discord.py Version: {} | Current Python Version: {}'.format(discord.__version__,
                                                                                platform.python_version()))
-    await bot.change_presence(game=discord.Game(name="What do you want?"), status=discord.Status.online)
+    await bot.change_presence(status=discord.Status.online, activity=discord.Game("What do you want?"))
 
 
 @bot.command(hidden=True)
@@ -74,7 +75,6 @@ async def _reloadall(ctx):
 
 
 @bot.command(hidden=True)
-@commands.check(is_admin)
 async def adminhelp(ctx):
     cmdlist = {}
     for cmd in bot.get_cog_commands('AdminCmds'):
@@ -163,22 +163,28 @@ async def on_member_update(before, after):
         else:
             descr = "Role " + changedrole
     if not descr == '':
-        embed = discord.Embed(title="User {} : {} has been updated.".format(str(before), before.id), description=descr)
+        embed = discord.Embed(title="User {} : {} has been updated.".format(str(before), before.id), description=descr,
+                              timestamp=datetime.datetime.utcnow())
         await bot.get_channel(Database.getLogChannel(before.guild.id)).send(embed=embed)
 
 
 @bot.listen()
 @commands.check(has_log_enabled)
 async def on_member_ban(guild, user):
-    await bot.get_channel(Database.getLogChannel(guild.id)).send('User {} : {} has been banned.'
-                                                                 .format(str(user), user.id))
-
+    async for entry in guild.audit_logs(limit=None, target=user, action=discord.AuditLogAction.ban):
+        embed = discord.Embed(title=f"User {str(user)} : {user.id} has been banned.",
+                              description=f"Audit #{entry.id}, user banned by {entry.user}",
+                              timestamp=entry.created_at)
+        await bot.get_channel(Database.getLogChannel(guild.id)).send(embed=embed)
 
 @bot.listen()
 @commands.check(has_log_enabled)
 async def on_member_unban(guild, user):
-    await bot.get_channel(Database.getLogChannel(guild.id)).send('User {} : {} has been unbanned.'
-                                                                 .format(str(user), user.id))
+    async for entry in guild.audit_logs(limit=None, target=user, action=discord.AuditLogAction.unban):
+        embed = discord.Embed(title=f"User {str(user)} : {user.id} has been unbanned.",
+                              description=f"Audit #{entry.id}, user unbanned by {entry.user}",
+                              timestamp=entry.created_at)
+        await bot.get_channel(Database.getLogChannel(guild.id)).send(embed=embed)
 
 if __name__ == "__main__":
     for extension in startup_extensions:

@@ -34,22 +34,49 @@ class OwnerCmds:
         embed = discord.Embed(title="List of Guild Roles", description=str(listofroles))
         await ctx.send(embed=embed)
 
-    @commands.command()
+    @commands.group()
     @commands.check(is_owner)
-    async def setgame(self, ctx, *, setgameto: str = ''):
-        await self.bot.change_presence(game=discord.Game(name=setgameto))
+    async def presence(self, ctx):
+        pass
 
-    @commands.command()
+    @presence.command(aliases=['gaming'])
     @commands.check(is_owner)
-    async def setstatus(self, ctx, setstatusto: str = 'on'):
+    async def game(self, ctx, *, setgameto: str = ''):
+        await self.bot.change_presence(activity=discord.Game(name=setgameto), status=ctx.me.status)
+
+    @presence.command(aliases=['streaming'])
+    @commands.check(is_owner)
+    async def stream(self, ctx, *, streamurl: str = ''):
+        await self.bot.change_presence(activity=discord.Streaming(name=streamurl), status=ctx.me.status)
+
+    @presence.command(aliases=['watching'])
+    @commands.check(is_owner)
+    async def watch(self, ctx, *, setgameto: str = ''):
+        await self.bot.change_presence(activity=discord.Activity(name=setgameto, type=discord.ActivityType.watching),
+                                       status=ctx.me.status)
+
+    @presence.command(aliases=['listening'])
+    @commands.check(is_owner)
+    async def listen(self, ctx, *, setgameto: str = ''):
+        await self.bot.change_presence(
+            activity=discord.Activity(name=setgameto, type=discord.ActivityType.listening),
+            status=ctx.me.status)
+
+    @presence.command()
+    @commands.check(is_owner)
+    async def status(self, ctx, setstatusto: str = 'on'):
         if setstatusto == 'online' or setstatusto == 'on':
-            await self.bot.change_presence(status=discord.Status.online, game=discord.Game(name=str(ctx.me.game)))
+            await self.bot.change_presence(status=discord.Status.online, activity=discord.Activity(
+                name=ctx.me.activity.name, type=ctx.me.activity.type))
         elif setstatusto == 'invisible' or setstatusto == 'inv' or setstatusto == 'invis':
-            await self.bot.change_presence(status=discord.Status.invisible, game=discord.Game(name=str(ctx.me.game)))
+            await self.bot.change_presence(status=discord.Status.invisible, activity=discord.Activity(
+                name=ctx.me.activity.name, type=ctx.me.activity.type))
         elif setstatusto == 'idle':
-            await self.bot.change_presence(status=discord.Status.idle, game=discord.Game(name=str(ctx.me.game)))
+            await self.bot.change_presence(status=discord.Status.idle, activity=discord.Activity(
+                name=ctx.me.activity.name, type=ctx.me.activity.type))
         elif setstatusto == 'dnd' or setstatusto == 'donotdisturb' or setstatusto == 'do not disturb':
-            await self.bot.change_presence(status=discord.Status.dnd, game=discord.Game(name=str(ctx.me.game)))
+            await self.bot.change_presence(status=discord.Status.dnd, activity=discord.Activity(
+                name=ctx.me.activity.name, type=ctx.me.activity.type))
 
     @commands.command()
     @commands.check(is_owner)
