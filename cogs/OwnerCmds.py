@@ -22,11 +22,6 @@ class OwnerCmds:
 
     @commands.command()
     @commands.check(is_owner)
-    async def exec(self, ctx, code: str):
-        exec(code)
-
-    @commands.command()
-    @commands.check(is_owner)
     async def printroles(self, ctx):
         listofroles = []
         for role in ctx.message.guild.roles:
@@ -39,15 +34,17 @@ class OwnerCmds:
     async def presence(self, ctx):
         pass
 
-    @presence.command(aliases=['gaming'])
+    @presence.command(aliases=['gaming', 'play', 'playing'])
     @commands.check(is_owner)
     async def game(self, ctx, *, setgameto: str = ''):
         await self.bot.change_presence(activity=discord.Game(name=setgameto), status=ctx.me.status)
 
     @presence.command(aliases=['streaming'])
     @commands.check(is_owner)
-    async def stream(self, ctx, *, streamurl: str = ''):
-        await self.bot.change_presence(activity=discord.Streaming(name=streamurl), status=ctx.me.status)
+    async def stream(self, ctx, streamname: str, streamurl: str = ''):
+        if not streamurl[:8] == "https://":
+            return False
+        await self.bot.change_presence(activity=discord.Streaming(name=streamname, url=streamurl), status=ctx.me.status)
 
     @presence.command(aliases=['watching'])
     @commands.check(is_owner)
@@ -95,6 +92,10 @@ class OwnerCmds:
     async def say(self, ctx, channel: str, *, msg: str):
         if channel == '0':
             await ctx.send(msg)
+            await ctx.message.delete()
+        elif channel.isnumeric():
+            channel = self.bot.get_channel(int(channel))
+            await channel.send(msg)
             await ctx.message.delete()
         else:
             await discord.utils.get(ctx.message.guild.channels, name=channel).send(msg)
@@ -174,25 +175,6 @@ class OwnerCmds:
             else:
                 self._last_result = ret
                 await ctx.send(f'```py\n{value}{ret}\n```')
-
-
-"""
-    @commands.command()
-    @commands.is_owner()
-    async def ghostafk(self, ctx, user: discord.Member, chance: int = 20):
-        if str(user) in getGuildSetting(ctx.guild.id, "ghostafk"):
-            removeGuildSetting(ctx.guild.id, "ghostafk", str(user))
-        else:
-            appendGuildSetting(ctx.guild.id, "ghostafk", str(user))
-        while str(user) in getGuildSetting(ctx.guild.id, "ghostafk"):
-            await asyncio.sleep(5)
-            try:
-                if random.randint(0, chance) == 1:
-                    await user.move_to(ctx.guild.get_channel(356992803131359232))
-                    print("ghost moved " + str(user))
-            except:
-                print("error moving " + str(user))
-"""
 
 
 def setup(bot):
