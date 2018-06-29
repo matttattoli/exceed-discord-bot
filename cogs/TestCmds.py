@@ -8,7 +8,7 @@ from cogs.utils.debug import *
 import asyncio
 import aiohttp
 import async_timeout
-
+from cogs.utils.misc import printOverLimit
 
 class TestCmds:
     def __init__(self, bot):
@@ -19,23 +19,34 @@ class TestCmds:
     async def test2(self, ctx):
         await ctx.send(str(self.bot.emojis))
 
-    @commands.command()
-    async def testcheckmc(self, ctx):
-        async with aiohttp.ClientSession() as cs:
-            with async_timeout.timeout(10):
-                async with cs.get("https://api.mcsrvstat.us/1/gamfrk.noip.me:7777") as r:
-                    data = await r.json()
-        if "offline" in data:
-            await ctx.send("Server offline")
-        else:
-            embed = discord.Embed(title="Showing server info for Minecraft")
-            embed.add_field(name="IP", value="gamfrk.noip.me:7777", inline=False)
-            if "list" in data["players"]:
-                playersval = "{} - {}".format(data["players"]["online"], data["players"]["list"])
+    @commands.group() # invoke_without_cmd
+    @commands.check(is_owner)
+    async def test(self, ctx):
+        pass
+
+    @test.command()
+    @commands.check(is_owner)
+    async def listemojis(self, ctx):
+        allemojis = []
+        for x in self.bot.emojis:
+            if x.animated:
+                allemojis.append(f'<a:{x.name}:{x.id}>')
             else:
-                playersval = data["players"]["online"]
-            embed.add_field(name="Players", value=playersval, inline=False)
-            await ctx.send(embed=embed)
+                allemojis.append(f':{x.name}:')
+        allemojis = ' '.join(allemojis)
+        printout = printOverLimit(allemojis)
+        if type(printout) == list:
+            for x in printout:
+                await ctx.send(x)
+        else:
+            await ctx.send(printout)
+
+    @test.command()
+    @commands.check(is_owner)
+    async def invitebot(self, ctx):
+        await ctx.send(f"""You can use this link to try to invite the bot to another server, althought you may need\
+        manage server roles. Also you might want to change the permissions argument in the link to 0, up to you.\
+        https://discordapp.com/oauth2/authorize?client_id={self.bot.user.id}&scope=bot&permissions=8""")
 
 
 def setup(bot):

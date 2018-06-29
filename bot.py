@@ -177,6 +177,7 @@ async def on_member_ban(guild, user):
                               timestamp=entry.created_at)
         await bot.get_channel(Database.getLogChannel(guild.id)).send(embed=embed)
 
+
 @bot.listen()
 @commands.check(has_log_enabled)
 async def on_member_unban(guild, user):
