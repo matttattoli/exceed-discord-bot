@@ -15,9 +15,11 @@ class RemindParser:
             data = msg.split(" to ")
             timedelta = data[0].split("in ")[1]
             remindmsg = data[1]
+            print(f"{timedelta} ..... {remindmsg}")
         if timedelta == '':
             timedelta = msg.split(" ")[0]
             remindmsg = msg.replace(timedelta + " ", "")
+            print(f"{timedelta} ..... {remindmsg}")
         if timedelta.endswith("s"):
             timedelta = datetime.datetime.now() + datetime.timedelta(seconds=int(timedelta[:-1]))
         elif timedelta.endswith("m"):
@@ -26,6 +28,12 @@ class RemindParser:
             timedelta = datetime.datetime.now() + datetime.timedelta(hours=int(timedelta[:-1]))
         elif timedelta.endswith("d"):
             timedelta = datetime.datetime.now() + datetime.timedelta(days=int(timedelta[:-1]))
+        elif timedelta.endswith("w"):
+            timedelta = datetime.datetime.now() + datetime.timedelta(weeks=int(timedelta[:-1]))
+        elif timedelta.endswith("mo"):
+            timedelta = datetime.datetime.now() + datetime.timedelta(weeks=4*int(timedelta[:-2]))
+        elif timedelta.endswith("y"):
+            timedelta = datetime.datetime.now() + datetime.timedelta(weeks=12*4*int(timedelta[:-1]))
         return timedelta, remindmsg
 
 
