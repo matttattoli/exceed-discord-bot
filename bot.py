@@ -14,7 +14,7 @@ from cogs.utils.checks import *
 from cogs.utils.GlobalVars import *
 from cogs.utils.debug import *
 from cogs.utils.Database import Database
-description = "Pro bot to EXCEED your imagination"
+description = "Discord bot that will EXCEED your imagination"
 bot = Bot(description=description, command_prefix=commands.when_mentioned_or(config["prefix"]), pm_help=True)
 startup_extensions = ("cogs.PublicCmds", "cogs.AdminCmds", "cogs.OwnerCmds", "cogs.TestCmds", "cogs.Music",
                       "cogs.Stats", "cogs.FunRoles", "cogs.Reminders")
