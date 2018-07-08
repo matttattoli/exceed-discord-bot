@@ -82,7 +82,7 @@ class OwnerCmds:
         await ctx.send("Bot Killed!")
         if ctx.me.voice is not None:
             await ctx.voice_client.disconnect()
-            await bot.change_presence(status=discord.Status.dnd, activity=discord.Game("KILLED"))
+            await self.bot.change_presence(status=discord.Status.dnd, activity=discord.Game("KILLED"))
         await self.bot.change_presence(status=discord.Status.invisible)
         await self.bot.logout()
         # await sys.exit()
