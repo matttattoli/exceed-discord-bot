@@ -39,6 +39,7 @@ class YTDLSource(discord.PCMVolumeTransformer):
 
         self.title = data.get('title')
         self.url = data.get('url')
+        self.duration = data.get('duration')
 
     @classmethod
     async def from_url(cls, url, *, loop=None):
@@ -56,6 +57,9 @@ class YTDLSource(discord.PCMVolumeTransformer):
 class Music:
     def __init__(self, bot):
         self.bot = bot
+        self.songqueue = []
+        self.currentsong = ''
+        self.audio_player = self.bot.loop.create_task(self.queuehandler())
 
     @commands.command()
     async def join(self, ctx, *, channel: discord.VoiceChannel):
@@ -66,25 +70,25 @@ class Music:
 
         await channel.connect()
 
-    @commands.command()
-    async def play(self, ctx, *, query):
-        """Plays a file from the local filesystem"""
+    # @commands.command()
+    # async def play(self, ctx, *, query):
+    #     """Plays a file from the local filesystem"""
+    #
+    #     if ctx.voice_client is None:
+    #         if ctx.author.voice.channel:
+    #             await ctx.author.voice.channel.connect()
+    #         else:
+    #             return await ctx.send("Not connected to a voice channel.")
+    #
+    #     if ctx.voice_client.is_playing():
+    #         ctx.voice_client.stop()
+    #
+    #     source = discord.PCMVolumeTransformer(discord.FFmpegPCMAudio(query))
+    #     ctx.voice_client.play(source, after=lambda e: print('Player error: %s' % e) if e else None)
+    #
+    #     await ctx.send('Now playing: {}'.format(query))
 
-        if ctx.voice_client is None:
-            if ctx.author.voice.channel:
-                await ctx.author.voice.channel.connect()
-            else:
-                return await ctx.send("Not connected to a voice channel.")
-
-        if ctx.voice_client.is_playing():
-            ctx.voice_client.stop()
-
-        source = discord.PCMVolumeTransformer(discord.FFmpegPCMAudio(query))
-        ctx.voice_client.play(source, after=lambda e: print('Player error: %s' % e) if e else None)
-
-        await ctx.send('Now playing: {}'.format(query))
-
-    @commands.command()
+    @commands.command(aliases=['play', 'youtube'])
     async def yt(self, ctx, *, url):
         """Streams from a url (almost anything youtube_dl supports)"""
 
@@ -99,8 +103,54 @@ class Music:
 
         player = await YTDLSource.from_url(url, loop=self.bot.loop)
         ctx.voice_client.play(player, after=lambda e: print('Player error: %s' % e) if e else None)
-
+        self.currentsong = player.title
         await ctx.send('Now playing: {}'.format(player.title))
+
+    @commands.group(aliases=['q', 'que'], invoke_without_command=True)
+    async def queue(self, ctx, *, url):
+        """Adds something to the music queue"""
+        if ctx.voice_client is None:
+            if ctx.author.voice.channel:
+                await ctx.author.voice.channel.connect()
+            else:
+                return await ctx.send("Not connected to a voice channel.")
+        if ctx.voice_client.is_playing() or len(self.songqueue) >= 1:
+            newsong = {"ctx": ctx, "url": url}
+            self.songqueue.append(newsong)
+            return await ctx.send(f"Added `{url}` to queue.")
+        else:
+            player = await YTDLSource.from_url(url, loop=self.bot.loop)
+            ctx.voice_client.play(player, after=lambda e: print('Player error: %s' % e) if e else None)
+            self.currentsong = player.title
+            await ctx.send('Now playing: {}'.format(player.title))
+
+    @queue.command()
+    async def list(self, ctx):
+        """List the current queue"""
+        if len(self.songqueue) >= 1:
+            return await ctx.send(f'`{self.songqueue}`')
+        else:
+            return await ctx.send("No songs are currently in the queue")
+
+    async def queuehandler(self):
+        await self.bot.wait_until_ready()
+        while not self.bot.is_closed():
+            if len(self.songqueue) >= 1:
+                ctx = self.songqueue[0]['ctx']
+                url = self.songqueue[0]['url']
+                if not ctx.voice_client.is_playing():
+                    player = await YTDLSource.from_url(url, loop=self.bot.loop)
+                    ctx.voice_client.play(player, after=lambda e: print('Player error: %s' % e) if e else None)
+                    self.currentsong = player.title
+                    await ctx.send('Now playing: {}'.format(player.title))
+                    self.songqueue.pop(0)
+            await asyncio.sleep(2)
+
+    @commands.command(aliases=['skip'])
+    async def next(self, ctx):
+        if ctx.voice_client.is_playing():
+            await ctx.send("Skipping")
+            ctx.voice_client.stop()
 
     @commands.command()
     async def volume(self, ctx, volume: float):
@@ -115,6 +165,7 @@ class Music:
     @commands.command(aliases=["disconnect"])
     async def stop(self, ctx):
         """Stops and disconnects the bot from voice"""
+        self.songqueue.clear()
         await ctx.voice_client.disconnect()
 
 
