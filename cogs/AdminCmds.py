@@ -39,8 +39,8 @@ class AdminCmds:
     async def user(self, ctx, mem: discord.Member, number: int):
         def is_user(m):
             return m.author == mem
-        await ctx.message.channel.purge(limit=number, check=is_user)
-        await ctx.send('Deleted {} message(s) from {}'.format(number, str(mem)), delete_after=3)
+        msgs = await ctx.message.channel.purge(limit=number, check=is_user)
+        await ctx.send(f'Deleted {len(msgs)} message(s) from {str(mem)}', delete_after=3)
 
     # @commands.command()
     # @commands.check(is_admin)
