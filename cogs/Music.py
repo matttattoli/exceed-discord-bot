@@ -1,6 +1,7 @@
 import asyncio
-
+from cogs.utils.checks import *
 import discord
+import datetime
 import youtube_dl
 
 from discord.ext import commands
@@ -58,8 +59,10 @@ class Music:
     def __init__(self, bot):
         self.bot = bot
         self.songqueue = []
-        self.currentsong = ''
+        self._currentsong = ''
+        self._duration = 0
         self.audio_player = self.bot.loop.create_task(self.queuehandler())
+        self.skips = []
 
     @commands.command()
     async def join(self, ctx, *, channel: discord.VoiceChannel):
@@ -103,7 +106,8 @@ class Music:
 
         player = await YTDLSource.from_url(url, loop=self.bot.loop)
         ctx.voice_client.play(player, after=lambda e: print('Player error: %s' % e) if e else None)
-        self.currentsong = player.title
+        self._currentsong = player.title
+        self._duration = player.duration
         await ctx.send('Now playing: {}'.format(player.title))
 
     @commands.group(aliases=['q', 'que'], invoke_without_command=True)
@@ -115,20 +119,22 @@ class Music:
             else:
                 return await ctx.send("Not connected to a voice channel.")
         if ctx.voice_client.is_playing() or len(self.songqueue) >= 1:
-            newsong = {"ctx": ctx, "url": url}
+            player = await YTDLSource.from_url(url, loop=self.bot.loop)
+            newsong = {"ctx": ctx, "url": url, "player": player, "name": player.title}
             self.songqueue.append(newsong)
-            return await ctx.send(f"Added `{url}` to queue.")
+            return await ctx.send(f"Added `{player.title}` to queue.")
         else:
             player = await YTDLSource.from_url(url, loop=self.bot.loop)
             ctx.voice_client.play(player, after=lambda e: print('Player error: %s' % e) if e else None)
-            self.currentsong = player.title
+            self._currentsong = player.title
+            self._duration = player.duration
             await ctx.send('Now playing: {}'.format(player.title))
 
     @queue.command()
     async def list(self, ctx):
         """List the current queue"""
         if len(self.songqueue) >= 1:
-            return await ctx.send(f'`{self.songqueue}`')
+            return await ctx.send('`{}`'.format([x['name'] for x in self.songqueue]))
         else:
             return await ctx.send("No songs are currently in the queue")
 
@@ -137,19 +143,48 @@ class Music:
         while not self.bot.is_closed():
             if len(self.songqueue) >= 1:
                 ctx = self.songqueue[0]['ctx']
-                url = self.songqueue[0]['url']
+                player = self.songqueue[0]['player']
                 if not ctx.voice_client.is_playing():
-                    player = await YTDLSource.from_url(url, loop=self.bot.loop)
                     ctx.voice_client.play(player, after=lambda e: print('Player error: %s' % e) if e else None)
-                    self.currentsong = player.title
+                    self._currentsong = player.title
+                    self._duration = player.duration
                     await ctx.send('Now playing: {}'.format(player.title))
                     self.songqueue.pop(0)
             await asyncio.sleep(2)
 
-    @commands.command(aliases=['skip'])
+    @commands.group(aliases=['skip'], invoke_without_command=True)
     async def next(self, ctx):
+        if ctx.me.voice is None or not self._currentsong or not ctx.voice_client.is_playing():
+            self.skips.clear()
+            return await ctx.send("Nothing playing to skip...")
+        if ctx.author not in self.skips and ctx.author in ctx.me.voice.channel.members:
+            self.skips.append(ctx.author)
+        elif ctx.author in self.skips:
+            return await ctx.send(f"Nice try {ctx.author.display_name}, you already tried skipping")
+        elif ctx.author not in ctx.me.voice.channel.members:
+            return await ctx.\
+                send(f"You aren't even listening {ctx.author.display_name}, why do you care what's playing?")
+        if (len(self.skips) / len(ctx.me.voice.channel.members)) >= 0.65:
+            if ctx.voice_client.is_playing():
+                await ctx.send("Skipping")
+                self.skips.clear()
+                self._currentsong = ''
+                self._duration = 0
+                ctx.voice_client.stop()
+        else:
+            await ctx.send(f"{int((len(self.skips) / len(ctx.me.voice.channel.members))*100)}% "
+                           f"voted to skip, need at least 65%")
+
+    @next.command(aliases=['or', 'force', 'f'])
+    @commands.check(is_admin)
+    async def override(self, ctx):
+        if ctx.me.voice is None:
+            return None
         if ctx.voice_client.is_playing():
-            await ctx.send("Skipping")
+            await ctx.send(f"Force skipped by {str(ctx.author)}")
+            self.skips.clear()
+            self._currentsong = ''
+            self._duration = 0
             ctx.voice_client.stop()
 
     @commands.command()
@@ -166,7 +201,18 @@ class Music:
     async def stop(self, ctx):
         """Stops and disconnects the bot from voice"""
         self.songqueue.clear()
+        self.skips.clear()
+        self._currentsong = ''
+        self._duration = 0
         await ctx.voice_client.disconnect()
+
+    @commands.command()
+    async def currentsong(self, ctx):
+        if self._currentsong:
+            dur = datetime.timedelta(seconds=self._duration)
+            return await ctx.send(f'Currently playing: {self._currentsong} for a duration of {str(dur)}')
+        else:
+            return await ctx.send("Nothing currently playing.")
 
 
 """
