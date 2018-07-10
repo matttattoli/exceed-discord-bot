@@ -130,13 +130,27 @@ class Music:
             self._duration = player.duration
             await ctx.send('Now playing: {}'.format(player.title))
 
-    @queue.command()
+    @queue.group(invoke_without_command=True)
     async def list(self, ctx):
         """List the current queue"""
         if len(self.songqueue) >= 1:
             return await ctx.send('`{}`'.format([x['name'] for x in self.songqueue]))
         else:
             return await ctx.send("No songs are currently in the queue")
+
+    @list.command(hidden=True)
+    async def raw(self, ctx):
+        if len(self.songqueue) >= 1:
+            return await ctx.send(f'`{self.songqueue}`')
+        else:
+            return await ctx.send("No songs are currently in the queue")
+
+    @queue.command()
+    async def remove(self, ctx, rm: int):
+        """Remove a queued song"""
+        if len(self.songqueue) >= 1:
+            if self.songqueue[rm]['requester'] == ctx.author or is_admin(ctx):
+                return self.songqueue.remove(self.songqueue[rm])
 
     async def queuehandler(self):
         await self.bot.wait_until_ready()
