@@ -148,9 +148,12 @@ class Music:
     @queue.command()
     async def remove(self, ctx, rm: int):
         """Remove a queued song"""
-        if len(self.songqueue) >= 1:
-            if self.songqueue[rm]['requester'] == ctx.author or is_admin(ctx):
+        if len(self.songqueue) >= 1 and not rm > len(self.songqueue) - 1:
+            if self.songqueue[rm]['requester'].id == ctx.author.id or is_admin(ctx):
+                await ctx.send(f"Removing {self.songqueue[rm]['name']} from queue")
                 return self.songqueue.remove(self.songqueue[rm])
+            if not self.songqueue[rm]['requester'].id == ctx.author.id:
+                return await ctx.send(f"You didn't request this song! Ask {self.songqueue[rm]['requester'].name}")
 
     async def queuehandler(self):
         await self.bot.wait_until_ready()
