@@ -120,7 +120,7 @@ class Music:
                 return await ctx.send("Not connected to a voice channel.")
         if ctx.voice_client.is_playing() or len(self.songqueue) >= 1:
             player = await YTDLSource.from_url(url, loop=self.bot.loop)
-            newsong = {"ctx": ctx, "url": url, "player": player, "name": player.title}
+            newsong = {"ctx": ctx, "url": url, "player": player, "name": player.title, "requester": ctx.author}
             self.songqueue.append(newsong)
             return await ctx.send(f"Added `{player.title}` to queue.")
         else:
@@ -148,7 +148,7 @@ class Music:
                     ctx.voice_client.play(player, after=lambda e: print('Player error: %s' % e) if e else None)
                     self._currentsong = player.title
                     self._duration = player.duration
-                    await ctx.send('Now playing: {}'.format(player.title))
+                    await ctx.send(f'Now playing: {player.title} requested by {self.songqueue[0]["requester"]}')
                     self.songqueue.pop(0)
             await asyncio.sleep(2)
 
@@ -164,7 +164,7 @@ class Music:
         elif ctx.author not in ctx.me.voice.channel.members:
             return await ctx.\
                 send(f"You aren't even listening {ctx.author.display_name}, why do you care what's playing?")
-        if (len(self.skips) / len(ctx.me.voice.channel.members)) >= 0.65:
+        if (len(self.skips) / len(ctx.me.voice.channel.members)-1) >= 0.65:
             if ctx.voice_client.is_playing():
                 await ctx.send("Skipping")
                 self.skips.clear()
@@ -172,7 +172,7 @@ class Music:
                 self._duration = 0
                 ctx.voice_client.stop()
         else:
-            await ctx.send(f"{int((len(self.skips) / len(ctx.me.voice.channel.members))*100)}% "
+            await ctx.send(f"{int((len(self.skips) / len(ctx.me.voice.channel.members)-1)*100)}% "
                            f"voted to skip, need at least 65%")
 
     @next.command(aliases=['or', 'force', 'f'])
