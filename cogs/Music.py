@@ -181,7 +181,7 @@ class Music:
         elif ctx.author not in ctx.me.voice.channel.members:
             return await ctx.\
                 send(f"You aren't even listening {ctx.author.display_name}, why do you care what's playing?")
-        if (len(self.skips) / len(ctx.me.voice.channel.members)-1) >= 0.65:
+        if (len(self.skips) / (len(ctx.me.voice.channel.members)-1)) >= 0.65:
             if ctx.voice_client.is_playing():
                 await ctx.send("Skipping")
                 self.skips.clear()
@@ -189,7 +189,7 @@ class Music:
                 self._duration = 0
                 ctx.voice_client.stop()
         else:
-            await ctx.send(f"{int((len(self.skips) / len(ctx.me.voice.channel.members)-1)*100)}% "
+            await ctx.send(f"{int((len(self.skips) / (len(ctx.me.voice.channel.members)-1))*100)}% "
                            f"voted to skip, need at least 65%")
 
     @next.command(aliases=['or', 'force', 'f'])
