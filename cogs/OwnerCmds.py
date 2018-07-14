@@ -129,7 +129,7 @@ class OwnerCmds:
     @blacklist.command()
     @commands.check(is_owner)
     async def add(self, ctx, user: discord.Member):
-        Database.blacklistUser(user.id, datetime.datetime.now())
+        Database.blacklistUser(user.id, user.display_name, datetime.datetime.now())
         await ctx.send(f"{str(user)} got blacklisted from using EXCEED-BOT")
 
     @blacklist.command()
@@ -138,6 +138,11 @@ class OwnerCmds:
         if user.id not in Database.getblacklist():
             Database.unblacklistUser(user.id)
             await ctx.send(f"{str(user)} got unnblacklisted from using EXCEED-BOT")
+
+    @blacklist.command()
+    @commands.check(is_owner)
+    async def list(self, ctx):
+        return await ctx.send(Database.getblacklist())
 
     def cleanup_code(self, content):
         """Automatically removes code blocks from the code."""

@@ -28,6 +28,7 @@ cursor.execute("""CREATE TABLE IF NOT EXISTS `funroles` (
         )""")
 cursor.execute("""CREATE TABLE IF NOT EXISTS `blacklist` (
         `userid` INTEGER NOT NULL UNIQUE,
+        `username` TEXT NOT NULL,
         `created_at` TEXT NOT NULL,
         PRIMARY KEY(`userid`)
         )""")
@@ -108,8 +109,9 @@ class Database:
                        (userid, created_at, expires, message,))
         db.commit()
 
-    def blacklistUser(userid: int, created_at: datetime.datetime):
-        cursor.execute("INSERT INTO blacklist(userid, created_at) VALUES(?,?)", (userid, created_at,))
+    def blacklistUser(userid: int, username: str, created_at: datetime.datetime):
+        cursor.execute("INSERT INTO blacklist(userid, username, created_at) VALUES(?,?,?)",
+                       (userid, username, created_at,))
         db.commit()
 
     def unblacklistUser(userid: int):
