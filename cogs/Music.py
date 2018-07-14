@@ -134,7 +134,11 @@ class Music:
     async def list(self, ctx):
         """List the current queue"""
         if len(self.songqueue) >= 1:
-            return await ctx.send('`{}`'.format([x['name'] for x in self.songqueue]))
+            songs = []
+            count = 0
+            for x in self.songqueue:
+                songs.append(f"{count}. {x['name']}")
+            return await ctx.send(f'`{songs}`')
         else:
             return await ctx.send("No songs are currently in the queue")
 
