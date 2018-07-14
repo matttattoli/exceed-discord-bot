@@ -138,6 +138,7 @@ class Music:
             count = 0
             for x in self.songqueue:
                 songs.append(f"{count}. {x['name']}")
+                count += 1
             return await ctx.send(f'`{songs}`')
         else:
             return await ctx.send("No songs are currently in the queue")
