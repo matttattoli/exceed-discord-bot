@@ -16,7 +16,7 @@ class FunRoles:
 
     @role.command()
     async def list(self, ctx):
-        return await ctx.send(Database.getFunRoles(ctx.guild.id))
+        return await ctx.send([x[0] for x in Database.getFunRoles(ctx.guild.id)])
 
     @role.command()
     @commands.check(is_admin)
