@@ -26,6 +26,11 @@ cursor.execute("""CREATE TABLE IF NOT EXISTS `funroles` (
         `roleid` INTEGER NOT NULL UNIQUE,
         PRIMARY KEY(`roleid`)
         )""")
+cursor.execute("""CREATE TABLE IF NOT EXISTS `blacklist` (
+        `userid` INTEGER NOT NULL UNIQUE,
+        `created_at` TEXT NOT NULL,
+        PRIMARY KEY(`userid`)
+        )""")
 db.commit()
 
 
@@ -102,3 +107,16 @@ class Database:
         cursor.execute("DELETE FROM reminders WHERE userid = ? AND created_at = ? AND expires = ? AND message = ?",
                        (userid, created_at, expires, message,))
         db.commit()
+
+    def blacklistUser(userid: int, created_at: datetime.datetime):
+        cursor.execute("INSERT INTO blacklist(userid, created_at) VALUES(?,?)", (userid, created_at,))
+        db.commit()
+
+    def unblacklistUser(userid: int):
+        cursor.execute("DELETE FROM blacklist WHERE userid = ?", (userid,))
+        db.commit()
+
+    def getblacklist():
+        cursor.execute("SELECT * FROM blacklist")
+        data = cursor.fetchall()
+        return data

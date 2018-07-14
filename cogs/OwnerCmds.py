@@ -14,6 +14,7 @@ import inspect
 import textwrap
 import datetime
 from collections import Counter
+from cogs.utils.Database import Database
 
 class OwnerCmds:
     def __init__(self, bot):
@@ -119,6 +120,24 @@ class OwnerCmds:
         for i in range(amount):
             await user.move_to(room)
             await asyncio.sleep(1)
+
+    @commands.group()
+    @commands.check(is_owner)
+    async def blacklist(self, ctx):
+        pass
+
+    @blacklist.command()
+    @commands.check(is_owner)
+    async def add(self, ctx, user: discord.Member):
+        Database.blacklistUser(user.id, datetime.datetime.now())
+        await ctx.send(f"{str(user)} got blacklisted from using EXCEED-BOT")
+
+    @blacklist.command()
+    @commands.check(is_owner)
+    async def remove(self, ctx, user: discord.Member):
+        if user.id not in Database.getblacklist():
+            Database.unblacklistUser(user.id)
+            await ctx.send(f"{str(user)} got unnblacklisted from using EXCEED-BOT")
 
     def cleanup_code(self, content):
         """Automatically removes code blocks from the code."""
