@@ -1,8 +1,19 @@
+limit = 20
+
+
 def printOverLimit(message):
-    if len(str(message)) < 2000:
+    message = str(message)
+    if len(message) < limit:
         return message
     printMsg = []
-    message = str(message)
-    for x in range(0, len(message), 1999):
-        printMsg.append(message[x:x+1999])
+    def cutitup(message):
+        if len(message) < limit:
+            printMsg.append(message)
+            return message
+        split = message[:limit - 1].rindex(' ')
+        printMsg.append(message[:split])
+        return cutitup(message[split:])
+
+    cutitup(message)
+
     return printMsg
