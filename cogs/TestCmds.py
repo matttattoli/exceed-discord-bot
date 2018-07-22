@@ -20,20 +20,37 @@ class TestCmds:
     async def test2(self, ctx):
         await ctx.send(str(self.bot.emojis))
 
-    @commands.group() # invoke_without_cmd
+    @commands.group()  # invoke_without_cmd
     @commands.check(is_owner)
     async def test(self, ctx):
         pass
 
     @test.command()
-    @commands.check(is_owner)
+    @commands.check(is_admin)
     async def listemojis(self, ctx):
         allemojis = []
         for x in self.bot.emojis:
             if x.animated:
                 allemojis.append(f'<a:{x.name}:{x.id}>')
             else:
-                allemojis.append(f':{x.name}:')
+                allemojis.append(f'<:{x.name}:{x.id}>')
+        allemojis = ' '.join(allemojis)
+        printout = printOverLimit(allemojis)
+        if type(printout) == list:
+            for x in printout:
+                await ctx.send(x)
+        else:
+            await ctx.send(printout)
+
+    @test.command()
+    @commands.check(is_admin)
+    async def listguildemojis(self, ctx):
+        allemojis = []
+        for x in ctx.guild.emojis:
+            if x.animated:
+                allemojis.append(f'<a:{x.name}:{x.id}>')
+            else:
+                allemojis.append(f'<:{x.name}:{x.id}>')
         allemojis = ' '.join(allemojis)
         printout = printOverLimit(allemojis)
         if type(printout) == list:
