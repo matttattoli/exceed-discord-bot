@@ -88,15 +88,16 @@ class PublicCmds:
 # gamfrk.noip.me:7777
     @commands.command()
     async def checkmc(self, ctx):
+        ip = 'proalpha.mynetgear.com:25565'
         async with aiohttp.ClientSession() as cs:
             with async_timeout.timeout(10):
-                async with cs.get("https://api.mcsrvstat.us/1/proalpha.mynetgear.com:25565") as r:
+                async with cs.get(f"https://api.mcsrvstat.us/1/{ip}") as r:
                     data = await r.json()
         if "offline" in data:
             await ctx.send("Server offline")
         else:
             embed = discord.Embed(title="Showing server info for Minecraft")
-            embed.add_field(name="IP", value="gamfrk.noip.me:7777", inline=False)
+            embed.add_field(name="IP", value=f"{ip}", inline=False)
             if "list" in data["players"]:
                 playersval = "{} - {}".format(data["players"]["online"], data["players"]["list"])
             else:
