@@ -85,12 +85,12 @@ class PublicCmds:
                                     + str(mem.id))
         embed.set_image(url=mem.avatar_url_as(static_format='png', size=1024))
         return await ctx.send(embed=embed)
-
+# gamfrk.noip.me:7777
     @commands.command()
     async def checkmc(self, ctx):
         async with aiohttp.ClientSession() as cs:
             with async_timeout.timeout(10):
-                async with cs.get("https://api.mcsrvstat.us/1/gamfrk.noip.me:7777") as r:
+                async with cs.get("https://api.mcsrvstat.us/1/proalpha.mynetgear.com:25565") as r:
                     data = await r.json()
         if "offline" in data:
             await ctx.send("Server offline")
