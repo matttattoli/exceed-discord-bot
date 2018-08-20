@@ -5,6 +5,9 @@ musicdl/
 logs/
 .vscode/
 .idea/
+creds.txt
+copyup.bat
+.idea/
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
