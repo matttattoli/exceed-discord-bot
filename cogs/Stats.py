@@ -23,11 +23,12 @@ class Stats:
             return await ctx.send("Error: Need a proper username")
         try:
             async with aiohttp.ClientSession() as cs:
-                with async_timeout.timeout(10):
+                with async_timeout.timeout(30):
                     async with cs.get("https://api.r6stats.com/api/v1/players/{}?platform={}"
                                       .format(player, platform)) as r:
                         stats = await r.json()
-        except:
+        except Exception as ex:
+            print(ex)
             return await ctx.send("Error: Need a valid username")
         if 'status' in stats:
             return await ctx.send(stats['errors'][0]['detail'])
