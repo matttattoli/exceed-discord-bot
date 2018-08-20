@@ -85,10 +85,10 @@ class PublicCmds:
                                     + str(mem.id))
         embed.set_image(url=mem.avatar_url_as(static_format='png', size=1024))
         return await ctx.send(embed=embed)
-# gamfrk.noip.me:7777
+# gamfrk.mynetgear.com:25565
+# proalpha.mynetgear.com:25565
     @commands.command()
-    async def checkmc(self, ctx):
-        ip = 'proalpha.mynetgear.com:25565'
+    async def checkmc(self, ctx, ip: str = 'gamfrk.mynetgear.com:25565'):
         async with aiohttp.ClientSession() as cs:
             with async_timeout.timeout(10):
                 async with cs.get(f"https://api.mcsrvstat.us/1/{ip}") as r:
