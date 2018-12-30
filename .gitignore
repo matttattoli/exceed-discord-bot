@@ -6,7 +6,9 @@ logs/
 .vscode/
 .idea/
 creds.txt
-copyup.bat
+prdcreds.txt
+copyupdev.bat
+copyupPRD.bat
 .idea/
 
 # Byte-compiled / optimized / DLL files
