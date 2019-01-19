@@ -30,7 +30,7 @@ class RemindParser:
             timedelta = datetime.datetime.now() + datetime.timedelta(days=int(timedelta[:-1]))
         elif timedelta.endswith("w"):
             timedelta = datetime.datetime.now() + datetime.timedelta(weeks=int(timedelta[:-1]))
-        elif timedelta.endswith("mo"):
+        elif timedelta.endswith("mo") or timedelta.endswith("mon"):
             timedelta = datetime.datetime.now() + datetime.timedelta(weeks=4*int(timedelta[:-2]))
         elif timedelta.endswith("y"):
             timedelta = datetime.datetime.now() + datetime.timedelta(weeks=12*4*int(timedelta[:-1]))
