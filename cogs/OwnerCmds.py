@@ -139,9 +139,9 @@ class OwnerCmds:
             Database.unblacklistUser(user.id)
             await ctx.send(f"{str(user)} got unnblacklisted from using EXCEED-BOT")
 
-    @blacklist.command()
+    @blacklist.command(aliases=['list'])
     @commands.check(is_owner)
-    async def list(self, ctx):
+    async def _list(self, ctx):
         return await ctx.send(Database.getblacklist())
 
     def cleanup_code(self, content):
