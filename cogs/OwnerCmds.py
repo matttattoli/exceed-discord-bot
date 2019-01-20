@@ -110,8 +110,9 @@ class OwnerCmds:
 
     @commands.command()
     @commands.check(is_admin)
+    async def repeat(self, ctx, num: int=1, *, msg: str=''):
         for _ in range(num):
-            await ctx.send(mem.mention + " " + msg)
+            await ctx.send(msg)
 
     @commands.command()
     @commands.is_owner()
