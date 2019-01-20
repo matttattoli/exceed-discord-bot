@@ -110,14 +110,13 @@ class OwnerCmds:
 
     @commands.command()
     @commands.check(is_admin)
-    async def mention(self, ctx, mem: discord.Member, num: int=1, msg: str=''):
-        for i in range(num):
+        for _ in range(num):
             await ctx.send(mem.mention + " " + msg)
 
     @commands.command()
     @commands.is_owner()
     async def fmove(self, ctx, user: discord.Member, room: discord.VoiceChannel, amount: int=1):
-        for i in range(amount):
+        for _ in range(amount):
             await user.move_to(room)
             await asyncio.sleep(1)
 
