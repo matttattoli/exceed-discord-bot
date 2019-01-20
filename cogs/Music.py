@@ -94,7 +94,6 @@ class Music:
     @commands.command(aliases=['play', 'youtube'])
     async def yt(self, ctx, *, url):
         """Streams from a url (almost anything youtube_dl supports)"""
-
         if ctx.voice_client is None:
             if ctx.author.voice.channel:
                 await ctx.author.voice.channel.connect()
@@ -130,8 +129,8 @@ class Music:
             self._duration = player.duration
             await ctx.send('Now playing: {}'.format(player.title))
 
-    @queue.group(invoke_without_command=True)
-    async def list(self, ctx):
+    @queue.group(invoke_without_command=True, aliases=['list'])
+    async def _list(self, ctx):
         """List the current queue"""
         if len(self.songqueue) >= 1:
             songs = []
@@ -143,7 +142,7 @@ class Music:
         else:
             return await ctx.send("No songs are currently in the queue")
 
-    @list.command(hidden=True)
+    @_list.command(hidden=True)
     async def raw(self, ctx):
         if len(self.songqueue) >= 1:
             return await ctx.send(f'`{self.songqueue}`')
